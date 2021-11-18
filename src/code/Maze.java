@@ -62,7 +62,7 @@ public class Maze {
 		grid[x][y] = "TB";
 		gridString += x + "," + y +";"; 
 	}
-	void initalizeHostagesAndPills() {
+	void initalizeHostagesAndPills() { // fix number of pills
 		hostages = random.nextInt(6) + 5;
 		pills = hostages;
 		for (int i = 0; i < hostages; i++) {
