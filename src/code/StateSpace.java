@@ -17,7 +17,7 @@ public class StateSpace extends SearchProblem{
 		n = Integer.parseInt(g1[1]);
 		
 		// carry
-		String c = g[1];
+		int c = Integer.parseInt(g[1]);
 		
 		// position of neo
 		String[] neoSplit = g[2].split(",");
@@ -45,8 +45,8 @@ public class StateSpace extends SearchProblem{
 		String[] padSplit = g[6].split(",");
 		ArrayList<Pad> pads = new ArrayList<Pad>();
 		for(int i = 0; i < padSplit.length ; i = i+4){
-			pads.add(new Pad (new Point(Integer.parseInt(padSplit[i]),Integer.parseInt(padSplit[i+1])), 
-					new Point(Integer.parseInt(padSplit[i+2]),Integer.parseInt(padSplit[i+3]))));
+			pads.add(new Pad (new Point(Integer.parseInt(padSplit[i]), Integer.parseInt(padSplit[i+1])), 
+					new Point(Integer.parseInt(padSplit[i+2]), Integer.parseInt(padSplit[i+3]))));
 		}
 		
 		// positions of pills
@@ -56,14 +56,7 @@ public class StateSpace extends SearchProblem{
 			hostages.add(new Hostage(Integer.parseInt(pillSplit[i]), Integer.parseInt(pillSplit[i+1]), Integer.parseInt(pillSplit[i+2])));
 		}
 		
-//		ArrayList[][] positions= new ArrayList()[][];
-//		positions.add(ironman);
-//		positions.add(new Point(-1,-1));
-//		positions.addAll(warriors);
-//		positions.add(new Point(-1,-1));
-//		positions.addAll(stones);
-//
-//		initialState = new IronmanState(positions,0);
+		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, 0);
 //		operators = new String[]{"collect","down","left","right","up","kill"};
 
 		//SearchTreeNode root = new SearchTreeNode(initialState,null,null,0,0); 

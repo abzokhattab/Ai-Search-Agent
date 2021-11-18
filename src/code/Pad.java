@@ -2,7 +2,7 @@ package code;
 
 import java.awt.Point;
 
-public class Pad {
+public class Pad extends Point {
 	Point startPad;
 	Point finishPad;
 	public Pad(Point startPad, Point finishPad) {
