@@ -3,8 +3,9 @@ package code;
 import java.awt.Point;
 
 public class Pad extends Point {
-	Point startPad;
-	Point finishPad;
+	public Point startPad;
+	public Point finishPad;
+	
 	public Pad(Point startPad, Point finishPad) {
 		super();
 		this.startPad = startPad;
