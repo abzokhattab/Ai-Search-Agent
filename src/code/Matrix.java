@@ -1,7 +1,7 @@
 package code;
 import java.util.Random;
 
-public class Maze {
+public class Matrix {
 	Random random = new Random(); // random.nextInt(max - min + 1) + min
 	String[][] grid;
 	String gridString;
@@ -20,7 +20,7 @@ public class Maze {
 	private String pillString = "";
 	private String padString = "";
 	private String hostageString = "";
-	public Maze() {
+	public Matrix() {
 		genGrid();
 	}
 	public void genGrid() {
@@ -194,18 +194,18 @@ public class Maze {
 		}
 	}
 	public static void main(String[] args) {
-		Maze maze = new Maze();
-//		maze.displayGrid();
+		Matrix maze = new Matrix();
+		maze.displayGrid();
 //		System.out.println(maze.m + "x" + maze.n);
-//		System.out.println("Carry: " + maze.c);
+		System.out.println("Carry: " + maze.c);
 //		System.out.println("Neo: (" + maze.neo.getX() +", " + maze.neo.getY()+")");
 //		System.out.println("Telephone: (" + maze.telephoneBooth.getX() +", " + maze.telephoneBooth.getY()+")");
-//		System.out.println("Agents: " + maze.agents);
+		System.out.println("Agents: " + maze.agents);
 //		System.out.println("Pills: " + maze.pills);
 //		System.out.println("Pad Pairs: " + maze.padPairs);
-//		System.out.println("Hostages: " + maze.hostages);
+		System.out.println("Hostages: " + maze.hostages);
 //		System.out.println(maze.gridString);
-		String s = solve(maze.gridString,"BF",false);
+		String s = solve(maze.gridString,"UC",false);
 		System.out.println(s);
 //		System.out.println("Hello");
 //		Random random = new Random();

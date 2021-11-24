@@ -56,7 +56,7 @@ public class StateSpace extends SearchProblem{
 		}
 		
 		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, new ArrayList<Hostage>(), false, 0, m, n);
-		operators = new String[]{"up", "down", "left", "right", "carry", "drop", "pill", "kill", "fly"};
+		operators = new String[]{"up", "down", "left", "right", "carry", "drop", "takePill", "kill", "fly"};
 	}
 	public boolean agentCollision(ArrayList<Agent> agents, Point neo) {
 		for(int i = 0; i < agents.size(); i++) {
@@ -81,6 +81,9 @@ public class StateSpace extends SearchProblem{
 	}
 	public boolean killAgents(Point neo, ArrayList<Agent> agents, int damage) {
 		boolean killed = false;
+		if(damage + 20 >= 100) {
+			return false; 
+		}
 		for(int i = 0; i < agents.size(); i++) {
 			if(((neo.x + 1 == agents.get(i).x && neo.y == agents.get(i).y ) || (neo.x - 1 == agents.get(i).x && neo.y == agents.get(i).y)
 					|| (neo.x == agents.get(i).x && neo.y + 1 == agents.get(i).y) || (neo.x == agents.get(i).x && neo.y - 1 == agents.get(i).y)) 
@@ -91,10 +94,6 @@ public class StateSpace extends SearchProblem{
 		}
 		if(killed) {
 			damage += 20;
-			if(damage >= 100) {
-				damage -= 20;
-				return false; ///////////////////////////////////// gameover
-			}
 		}
 		return killed;
 
@@ -110,7 +109,7 @@ public class StateSpace extends SearchProblem{
 			}
 			else {
 				currentDamage +=  2;
-				if(currentDamage >= 100) {
+				if(currentDamage >= 100 && !hostages.get(i).isSaved()) {
 					agents.add(new Agent(hostages.get(i).x, hostages.get(i).y, true));
 					hostages.remove(i);
 				}
@@ -122,9 +121,11 @@ public class StateSpace extends SearchProblem{
 		for(int i = 0; i < carriedHostages.size(); i++) {
 			int currentDamage = carriedHostages.get(i).getDamage();
 			if(pillCycle) {
-				currentDamage -= 20;
-				if(currentDamage < 0)
-					currentDamage = 0;
+				if(carriedHostages.get(i).getDamage() < 100) {
+					currentDamage -= 20;
+					if(currentDamage < 0)
+						currentDamage = 0;
+				}
 			}
 			else
 				currentDamage += 2;
@@ -140,7 +141,8 @@ public class StateSpace extends SearchProblem{
 		ArrayList<Hostage> carriedHostages = ((NeoState) node.state).getCarriedHostages();
 		ArrayList<Agent> agents = ((NeoState) node.state).getAgents();
 		int damage = ((NeoState) node.state).getDamage();
-
+		deadHostages = 0;
+		deadAgents = 0;
 		if(damage >= 100) 
 			return false;
 		if(carriedHostages.size() != 0)
@@ -150,19 +152,24 @@ public class StateSpace extends SearchProblem{
 		for(int i = 0; i < hostages.size(); i++) {
 			if(hostages.get(i).x != telephoneBooth.x || hostages.get(i).y != telephoneBooth.y)
 				return false;
-			if(hostages.get(i).getDamage() >= 100)
+			if(hostages.get(i).getDamage() >= 100 && hostages.get(i).isSaved())
 				deadHostages++;
 		}
 		for(int i = 0; i < agents.size(); i++) {
 			if(agents.get(i).isHostage() && !agents.get(i).isKilled())
 				return false;
-			else if(agents.get(i).isHostage() && agents.get(i).isKilled())
+			if(agents.get(i).isKilled())
 				deadAgents++;
+			if(agents.get(i).isHostage() && agents.get(i).isKilled())
+				deadHostages++;
+			
 		}
+		System.out.println(neo.x + " " + neo.y + " " + telephoneBooth.x + " " + telephoneBooth.y);
 		return true;
 	}
 	@Override
 	public State transitionFunction(State state, String operator) {
+		System.out.println(operator);
 		Point neo = ((NeoState) state).getNeo();		
 		int c = ((NeoState) state).getC();
 		boolean tookPill = ((NeoState) state).isTookPill();
@@ -247,8 +254,11 @@ public class StateSpace extends SearchProblem{
 			}
 			case "drop": {
 				if(neo.equals(telephoneBooth)) {
+					if(carriedHostages.size() == 0)
+						return null;
 					for(int i = 0; i < carriedHostages.size(); i++) {
 						Hostage droppedHostage = new Hostage(telephoneBooth.x, telephoneBooth.y, carriedHostages.get(i).getDamage());
+						droppedHostage.setSaved(true);
 						hostages.add(droppedHostage);
 					}
 					carriedHostages.clear();
@@ -258,10 +268,11 @@ public class StateSpace extends SearchProblem{
 						return null;
 					}
 					states.put(newState.toString(), "");
+					return newState;
 				}
 				return null;
 			}
-			case "pill": {
+			case "takePill": {
 				if(!tookPill) {
 					Point pill = takePill(neo, pills);
 					if(!pill.equals(new Point(-1, -1))) {
@@ -310,7 +321,7 @@ public class StateSpace extends SearchProblem{
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
-					states.put(newState.toString(), "");
+					states.put(newState.toString(), ""); 
 					return newState;
 				}
 				return null;
