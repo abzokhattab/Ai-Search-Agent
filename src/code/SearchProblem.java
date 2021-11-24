@@ -1,5 +1,6 @@
 package code;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Hashtable;
 
 
@@ -21,7 +22,7 @@ public abstract class SearchProblem {
 		{
 			State state = transitionFunction(node.state, operators[i]);
 			if(state !=null){
-				SearchTreeNode nodeTemp = new SearchTreeNode(state,node,operators[i],node.depth+1,state.pathCost);
+				SearchTreeNode nodeTemp = new SearchTreeNode(state,node,operators[i],node.depth+1,state.pathCost,state.heuristicOne,state.heuristicTwo);
 				nodes.add(nodeTemp);
 			}
 		}
@@ -46,7 +47,7 @@ public abstract class SearchProblem {
 			else if(oldNodes.isEmpty()){
 				currlevel +=1;
 				states= new Hashtable<String,String>();
-				oldNodes.add(new SearchTreeNode(this.initialState,null,null,0,0)); // new queue with the root node only
+				oldNodes.add(new SearchTreeNode(this.initialState,null,null,0,0,0,0)); // new queue with the root node only
 				return oldNodes;
 			}
 			return oldNodes;
@@ -57,6 +58,28 @@ public abstract class SearchProblem {
 			oldNodes.addAll(newNodes);
 			return sort(oldNodes);
 		}
+		
+		case "GR1":{
+			oldNodes.addAll(newNodes);
+			return sortHeuristicOne(oldNodes);
+		}
+		
+		case "GR2":{
+			oldNodes.addAll(newNodes);
+			return sortHeuristicTwo(oldNodes);
+		}
+		
+		case "AS1":{
+			oldNodes.addAll(newNodes);
+			return sortAHeuristicOne(oldNodes);
+		}
+		
+		case "AS2":{
+			oldNodes.addAll(newNodes);
+			return sortAHeuristicTwo(oldNodes);
+		}
+		
+		
 		
 		 default:
 			return oldNodes;
@@ -79,13 +102,44 @@ public abstract class SearchProblem {
                 j = j - 1; 
             } 
             nodes.get(j+1).pathCost= key; 
+            
         }
         return nodes;
     }
 	
+	public static ArrayList<SearchTreeNode> sortHeuristicOne(ArrayList<SearchTreeNode> nodes)  {
+		
+		nodes.sort(Comparator.comparing(a ->a.getHeuristicOne()));
+        return nodes;
+	}
+	
+
+	public static ArrayList<SearchTreeNode> sortHeuristicTwo(ArrayList<SearchTreeNode> nodes)  {
+		
+		nodes.sort(Comparator.comparing(a ->a.getHeuristicTwo()));
+        return nodes;
+	}
+	
+public static ArrayList<SearchTreeNode> sortAHeuristicOne(ArrayList<SearchTreeNode> nodes)  {
+		
+		nodes.sort(Comparator.comparing(a ->(a.getHeuristicOne()+a.gePathCost())));
+        return nodes;
+	}
+	
+public static ArrayList<SearchTreeNode> sortAHeuristicTwo(ArrayList<SearchTreeNode> nodes)  {
+	
+	nodes.sort(Comparator.comparing(a ->(a.getHeuristicTwo()+a.gePathCost())));
+    return nodes;
+}
+	
+	
+	
+	
+	
+	
 	public SearchTreeNode generalSearch(String strategy){
 		ArrayList<SearchTreeNode> nodes = new ArrayList<SearchTreeNode>();
-		nodes.add(new SearchTreeNode(this.initialState,null,null,0,0));
+		nodes.add(new SearchTreeNode(this.initialState,null,null,0,0,0,0));
 		while(!nodes.isEmpty()){
 			SearchTreeNode node = nodes.remove(0);
 			if(this.goalTest(node)){
@@ -95,4 +149,25 @@ public abstract class SearchProblem {
 		}	
 		return null;
 	}
+	
+	public static void main(String[]args) {
+		
+		SearchTreeNode x =new SearchTreeNode(null,null,null,2,4,5,5);
+		SearchTreeNode y =new SearchTreeNode(null,null,null,2,0,3,5);
+		SearchTreeNode z =new SearchTreeNode(null,null,null,2,4,0,5);
+		SearchTreeNode f =new SearchTreeNode(null,null,null,2,4,2,5);
+		
+		ArrayList<SearchTreeNode> d=new ArrayList <SearchTreeNode>();
+		d.add(x);
+		d.add(y);
+		d.add(z);
+		d.add(f);
+		sortAHeuristicOne(d);
+		for(int i=0;i<d.size();i++) {
+			System.out.println(d.get(i).heuristicOne+" "+d.get(i).pathCost);
+		}
+		
+	}
 }
+
+

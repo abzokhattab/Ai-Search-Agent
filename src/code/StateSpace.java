@@ -56,7 +56,7 @@ public class StateSpace extends SearchProblem{
 			hostages.add(new Hostage(Integer.parseInt(pillSplit[i]), Integer.parseInt(pillSplit[i+1]), Integer.parseInt(pillSplit[i+2])));
 		}
 		
-		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, 0);
+		//initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, 0);
 //		operators = new String[]{"collect","down","left","right","up","kill"};
 
 		//SearchTreeNode root = new SearchTreeNode(initialState,null,null,0,0); 

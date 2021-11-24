@@ -6,5 +6,7 @@ import java.util.ArrayList;
 
 public class State {
 	int pathCost;
+	int heuristicOne;
+	int heuristicTwo;
 
 }

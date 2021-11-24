@@ -13,6 +13,7 @@ public class NeoState extends State{
 	ArrayList<Point> hostages;
 	int damage; //cumulative or just the new damage?
 	
+	
 	public NeoState(Point neo, int c, Point telephoneBooth, ArrayList<Point> agents, ArrayList<Point> pills, ArrayList<Point> pads, ArrayList<Point> hostages, int damage) {
 		
 		super();
@@ -25,8 +26,26 @@ public class NeoState extends State{
 		this.hostages = hostages;
 		this.damage = damage;
 		this.pathCost = this.damage;
+		this.heuristicOne=heuristicFunction();
+		this.heuristicTwo=heuristicFunction();
 		
 	}
+	
+	public int heuristicFunction() {
+		
+		
+		return (Math.abs((this.telephoneBooth.y-this.neo.y)+(this.telephoneBooth.x-this.neo.x)));
+		
+	}
+	
+//	public int heuristicFunctionTwo() {
+//		
+//	}
 
-
+	public static void main(String[]args) {
+		
+	}
 }
+
+
+
