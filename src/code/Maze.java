@@ -37,7 +37,10 @@ public class Maze {
 		initalizePads();
 		gridString += agentString + pillString + padString + hostageString;
 	}
+	
 	public static String solve(String grid, String strategy, boolean visualize) {
+		StateSpace tree = new StateSpace(grid);
+		SearchTreeNode node = tree.generalSearch(strategy);
 		String plan = "";
 		String deaths = "";
 		String kills = "";
@@ -62,9 +65,8 @@ public class Maze {
 		grid[x][y] = "TB";
 		gridString += x + "," + y +";"; 
 	}
-	void initalizeHostagesAndPills() { // fix number of pills
+	void initalizeHostagesAndPills() {
 		hostages = random.nextInt(6) + 5;
-		pills = hostages;
 		for (int i = 0; i < hostages; i++) {
 			int hostageHealthRand = random.nextInt(99) + 1;
 			int x = random.nextInt(m);
@@ -80,7 +82,12 @@ public class Maze {
 			else
 				hostageString += x + "," + y + "," + hostageHealthRand + ";"; 
 			
-			// pills
+			
+		}
+		
+		// pills
+		pills = random.nextInt(hostages) + 1;
+		for (int i = 0; i < pills; i++) {
 			int xP = random.nextInt(m);
 			int yP = random.nextInt(n);
 			while (grid[xP][yP] != null) {
@@ -172,9 +179,9 @@ public class Maze {
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[i].length; j++) {
 				if(grid[i][j] == null)
-					grid[i][j] = "empty";
-				System.out.print(grid[i][j]);
-				System.out.print(" ");
+					grid[i][j] = "e";
+				System.out.print(" " + grid[i][j] + " ");
+				System.out.print("|");
 			}
 			System.out.println("");
 		}

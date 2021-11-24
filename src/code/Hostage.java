@@ -19,5 +19,13 @@ public class Hostage extends Point {
 		this.damage = damage;
 		// TODO Auto-generated constructor stub
 	}
+
+	public int getDamage() {
+		return damage;
+	}
+
+	public void setDamage(int damage) {
+		this.damage = damage;
+	}
 	
 }
