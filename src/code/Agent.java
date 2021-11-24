@@ -4,6 +4,7 @@ import java.awt.Point;
 
 public class Agent extends Point {
 	boolean hostage;
+	boolean killed = false;
 	public Agent() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -27,6 +28,15 @@ public class Agent extends Point {
 	public void setHostage(boolean hostage) {
 		this.hostage = hostage;
 	}
+
+	public boolean isKilled() {
+		return killed;
+	}
+
+	public void setKilled(boolean killed) {
+		this.killed = killed;
+	}
+	
 
 
 }

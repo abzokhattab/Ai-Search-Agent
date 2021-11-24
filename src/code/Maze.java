@@ -41,11 +41,18 @@ public class Maze {
 	public static String solve(String grid, String strategy, boolean visualize) {
 		StateSpace tree = new StateSpace(grid);
 		SearchTreeNode node = tree.generalSearch(strategy);
-		String plan = "";
-		String deaths = "";
-		String kills = "";
-		String nodes = "";
-		return plan + ";" + deaths + ";" + kills+ ";" + nodes;
+		String result = "";
+		if(node != null){
+			//int pathcost = node.pathCost;
+			//result += "snap";
+			while(node.parent != null){
+				result = node.operator + "," + result;
+				node = node.parent;
+			}
+			result += ";" + tree.deadHostages + ";" + tree.deadAgents + ";" + tree.nodesExpanded;
+		}
+		
+		return result;
 	}
 	void initalizeNeo() {
 		int x = random.nextInt(m);
@@ -188,16 +195,18 @@ public class Maze {
 	}
 	public static void main(String[] args) {
 		Maze maze = new Maze();
-		maze.displayGrid();
-		System.out.println(maze.m + "x" + maze.n);
-		System.out.println("Carry: " + maze.c);
-		System.out.println("Neo: (" + maze.neo.getX() +", " + maze.neo.getY()+")");
-		System.out.println("Telephone: (" + maze.telephoneBooth.getX() +", " + maze.telephoneBooth.getY()+")");
-		System.out.println("Agents: " + maze.agents);
-		System.out.println("Pills: " + maze.pills);
-		System.out.println("Pad Pairs: " + maze.padPairs);
-		System.out.println("Hostages: " + maze.hostages);
-		System.out.println(maze.gridString);
+//		maze.displayGrid();
+//		System.out.println(maze.m + "x" + maze.n);
+//		System.out.println("Carry: " + maze.c);
+//		System.out.println("Neo: (" + maze.neo.getX() +", " + maze.neo.getY()+")");
+//		System.out.println("Telephone: (" + maze.telephoneBooth.getX() +", " + maze.telephoneBooth.getY()+")");
+//		System.out.println("Agents: " + maze.agents);
+//		System.out.println("Pills: " + maze.pills);
+//		System.out.println("Pad Pairs: " + maze.padPairs);
+//		System.out.println("Hostages: " + maze.hostages);
+//		System.out.println(maze.gridString);
+		String s = solve(maze.gridString,"BF",false);
+		System.out.println(s);
 //		System.out.println("Hello");
 //		Random random = new Random();
 //		int m = random.nextInt(11) + 5;

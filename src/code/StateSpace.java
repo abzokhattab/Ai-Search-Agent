@@ -82,17 +82,19 @@ public class StateSpace extends SearchProblem{
 	public boolean killAgents(Point neo, ArrayList<Agent> agents, int damage) {
 		boolean killed = false;
 		for(int i = 0; i < agents.size(); i++) {
-			if((neo.x + 1 == agents.get(i).x && neo.y == agents.get(i).y) || (neo.x - 1 == agents.get(i).x && neo.y == agents.get(i).y)
-					|| (neo.x == agents.get(i).x && neo.y + 1 == agents.get(i).y) || (neo.x == agents.get(i).x && neo.y - 1 == agents.get(i).y)) {				
-				agents.remove(i);
+			if(((neo.x + 1 == agents.get(i).x && neo.y == agents.get(i).y ) || (neo.x - 1 == agents.get(i).x && neo.y == agents.get(i).y)
+					|| (neo.x == agents.get(i).x && neo.y + 1 == agents.get(i).y) || (neo.x == agents.get(i).x && neo.y - 1 == agents.get(i).y)) 
+					&& !agents.get(i).isKilled()) {				
+				agents.get(i).setKilled(true);
 				killed = true;
-				i--;
 			}
 		}
 		if(killed) {
 			damage += 20;
-//			if(damage >= 100)
-//				return ; ///////////////////////////////////// gameover
+			if(damage >= 100) {
+				damage -= 20;
+				return false; ///////////////////////////////////// gameover
+			}
 		}
 		return killed;
 
@@ -109,8 +111,8 @@ public class StateSpace extends SearchProblem{
 			else {
 				currentDamage +=  2;
 				if(currentDamage >= 100) {
-					hostages.remove(i);
 					agents.add(new Agent(hostages.get(i).x, hostages.get(i).y, true));
+					hostages.remove(i);
 				}
 				else
 					hostages.get(i).setDamage(currentDamage);
@@ -118,7 +120,7 @@ public class StateSpace extends SearchProblem{
 					
 		}
 		for(int i = 0; i < carriedHostages.size(); i++) {
-			int currentDamage = hostages.get(i).getDamage();
+			int currentDamage = carriedHostages.get(i).getDamage();
 			if(pillCycle) {
 				currentDamage -= 20;
 				if(currentDamage < 0)
@@ -148,10 +150,14 @@ public class StateSpace extends SearchProblem{
 		for(int i = 0; i < hostages.size(); i++) {
 			if(hostages.get(i).x != telephoneBooth.x || hostages.get(i).y != telephoneBooth.y)
 				return false;
+			if(hostages.get(i).getDamage() >= 100)
+				deadHostages++;
 		}
 		for(int i = 0; i < agents.size(); i++) {
-			if(agents.get(i).isHostage())
+			if(agents.get(i).isHostage() && !agents.get(i).isKilled())
 				return false;
+			else if(agents.get(i).isHostage() && agents.get(i).isKilled())
+				deadAgents++;
 		}
 		return true;
 	}

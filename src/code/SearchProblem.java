@@ -9,6 +9,8 @@ public abstract class SearchProblem {
 	String [] operators;
 	int nodesExpanded = 0;
 	int currlevel = 0;
+	int deadHostages = 0;
+	int deadAgents = 0;
 	Hashtable<String, String> states = new Hashtable<String, String>();
 	
 	public abstract boolean goalTest(SearchTreeNode node);
