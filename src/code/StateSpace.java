@@ -2,7 +2,8 @@ package code;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
+
 
 public class StateSpace extends SearchProblem{
 	int m;
@@ -21,37 +22,32 @@ public class StateSpace extends SearchProblem{
 		
 		// position of neo
 		String[] neoSplit = g[2].split(",");
-		Point neo = new Point(Integer.parseInt(neoSplit[0]),Integer.parseInt(neoSplit[1]));
+		Point neo = new Point(Integer.parseInt(neoSplit[0]), Integer.parseInt(neoSplit[1]));
 
 		// position of telephone booth
 		String [] tb = g[3].split(",");
-		Point telephoneBooth = new Point(Integer.parseInt(tb[0]),Integer.parseInt(tb[1]));
+		Point telephoneBooth = new Point(Integer.parseInt(tb[0]), Integer.parseInt(tb[1]));
 
 		// positions of agents
 		String[] agentSplit = g[4].split(",");
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		for(int i = 0; i < agentSplit.length; i = i + 2){
-			agents.add(new Agent(Integer.parseInt(agentSplit[i]),Integer.parseInt(agentSplit[i+1]), false));
+			agents.add(new Agent(Integer.parseInt(agentSplit[i]), Integer.parseInt(agentSplit[i+1]), false));
 		}
 		
 		// positions of pills
 		String[] pillSplit = g[5].split(",");
 		ArrayList<Point> pills = new ArrayList<Point>();
 		for(int i=0; i< pillSplit.length; i = i + 2){
-			pills.add(new Point(Integer.parseInt(pillSplit[i]),Integer.parseInt(pillSplit[i+1])));
+			pills.add(new Point(Integer.parseInt(pillSplit[i]), Integer.parseInt(pillSplit[i+1])));
 		}
 		
 		// positions of pads
 		String[] padSplit = g[6].split(",");
-		ArrayList<Pad> pads = new ArrayList<Pad>();
-		for(int i = 0; i < padSplit.length ; i = i + 4){
-			pads.add(new Pad (new Point(Integer.parseInt(padSplit[i]), Integer.parseInt(padSplit[i+1])), 
-					new Point(Integer.parseInt(padSplit[i+2]), Integer.parseInt(padSplit[i+3]))));
-			pads.add(new Pad (new Point (Integer.parseInt(padSplit[i+2]), Integer.parseInt(padSplit[i+3])), 
-					new Point(Integer.parseInt(padSplit[i]), Integer.parseInt(padSplit[i+1]))));
+		HashMap<String,String> pads = new HashMap<String,String>();
+		for(int i = 0; i < padSplit.length -3 ; i += 4) {
+			pads.put(padSplit[i] + "," + padSplit[i+1], padSplit[i+2] + "," + padSplit[i+3]);
 		}
-		
-		
 		// positions of hostages
 		String[] hostageSplit = g[7].split(",");
 		ArrayList<Hostage> hostages = new ArrayList<Hostage>();
@@ -62,6 +58,18 @@ public class StateSpace extends SearchProblem{
 		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, new ArrayList<Hostage>(), false, 0, m, n);
 		System.out.println("initialState " + initialState);
 		operators = new String[]{"up", "down", "left", "right", "carry", "drop", "takePill", "kill", "fly"};
+	
+
+
+//		
+//		String[] hstg = gridArray[7].split(",");
+//		HashMap<String,Integer> m7 = new HashMap<String,Integer>();
+//		for(int i = 0;i< hstg.length -2; i+=3) {
+//			m7.put(hstg[i]+","+hstg[i+1],Integer.parseInt(hstg[i+2]));
+//		}
+//		
+//		TH s = new TH(m,n,x10,x11,x00, x01,capacity, xyz,m4,m5,m7);
+//		boolean linkin = true;
 	}
 	public boolean agentCollision(ArrayList<Agent> agents, Point neo) {
 		for(int i = 0; i < agents.size(); i++) {
@@ -148,8 +156,8 @@ public class StateSpace extends SearchProblem{
 		int damage = ((NeoState) node.state).getDamage();
 		deadHostages = 0;
 		deadAgents = 0;
-		if(damage >= 100) 
-			return false;
+//		if(damage >= 100) 
+//			return false;
 		if(carriedHostages.size() != 0)
 			return false;
 		if(!neo.equals(telephoneBooth))
@@ -167,26 +175,25 @@ public class StateSpace extends SearchProblem{
 				deadAgents++;
 			if(agents.get(i).isHostage() && agents.get(i).isKilled())
 				deadHostages++;
-			
 		}
 		//System.out.println(states.toString());
 		return true;
 	}
 	@Override
 	public State transitionFunction(State state, String operator) {
-		//System.out.println(operator);
+//		System.out.print(operator);
+//		System.out.println(state.toString());
 		Point neoOriginal = ((NeoState) state).getNeo();	
 		int c = ((NeoState) state).getC();
 		boolean tookPill = ((NeoState) state).isTookPill();
 		Point telephoneBooth = ((NeoState) state).getTelephoneBooth();
 		ArrayList<Agent> agentsOriginal = ((NeoState) state).getAgents();
 		ArrayList<Point> pillsOriginal = ((NeoState) state).getPills(); 
-		ArrayList<Pad> padsOriginal = ((NeoState) state).getPads(); 
+		HashMap<String, String> pads = ((NeoState) state).getPads(); 
 		ArrayList<Hostage> hostagesOriginal = ((NeoState) state).getHostages();
 		ArrayList<Hostage> carriedHostagesOriginal = ((NeoState) state).getCarriedHostages();
 		ArrayList<Agent> agents = new ArrayList<Agent>();
 		ArrayList<Point> pills = new ArrayList<Point>();
-		ArrayList<Pad> pads = new ArrayList<Pad>();
 		ArrayList<Hostage> hostages = new ArrayList<Hostage>();
 		ArrayList<Hostage> carriedHostages = new ArrayList<Hostage>();
 		for(int i = 0; i < agentsOriginal.size(); i++) {
@@ -203,9 +210,6 @@ public class StateSpace extends SearchProblem{
 		}
 		for(int i = 0; i < carriedHostagesOriginal.size(); i++) {
 			carriedHostages.add(new Hostage(carriedHostagesOriginal.get(i).x, carriedHostagesOriginal.get(i).y, carriedHostagesOriginal.get(i).getDamage()));
-		}
-		for(int i = 0; i < padsOriginal.size(); i++) {
-			pads.add(new Pad(padsOriginal.get(i).startPad, padsOriginal.get(i).finishPad));
 		}
 		Point neo = new Point(neoOriginal.x, neoOriginal.y);
 		int damage = ((NeoState) state).getDamage();
@@ -332,19 +336,9 @@ public class StateSpace extends SearchProblem{
 				 return null;
 			}
 			case "fly": {
-				Point newPosition = new Point(-1, -1);
-				for(int i = 0; i < pads.size(); i++) {
-					Pad currentPad = pads.get(i);
-					if(neo.x == currentPad.startPad.x && neo.y == currentPad.startPad.y) {
-						newPosition = new Point(currentPad.finishPad.x, currentPad.finishPad.y);
-						break;
-					}
-					else if(neo.x == currentPad.finishPad.x && neo.y == currentPad.finishPad.y) {
-						newPosition = new Point(currentPad.startPad.x, currentPad.startPad.y);
-						break;
-					}
-				}
-				if(!newPosition.equals(new Point(-1, -1))) {
+				String fly = pads.get(neo.x + "," + neo.y);
+				if(fly != null) {
+					Point newPosition = new Point(Integer.parseInt(fly.charAt(0) +""), Integer.parseInt(fly.charAt(2) +""));
 					timeStep(false, hostages, carriedHostages, agents);
 					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
 					if(states.containsKey(newState.toString())){

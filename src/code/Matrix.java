@@ -48,9 +48,6 @@ public class Matrix {
 			//result += "snap";
 			while(node.parent != null){
 				result = node.operator + "," + result;
-				if(visualize) {
-					((NeoState) node.state).visaulizeState();
-				}
 				System.out.println(node.state);
 				node = node.parent;
 				
