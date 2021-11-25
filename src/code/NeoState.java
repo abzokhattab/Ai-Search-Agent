@@ -34,7 +34,7 @@ public class NeoState extends State{
 		this.grid = new String[m][n];
 		this.heuristicOne=heuristicFunction();
 		this.heuristicTwo=heuristicFunction();
-		populateGrid();
+		//populateGrid();
 
 	}
 	
