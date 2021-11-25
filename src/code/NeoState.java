@@ -58,7 +58,7 @@ public class NeoState extends State{
 		result += "TB" + telephoneBooth.x + "," + telephoneBooth.y + "; A";
 		for(int i = 0; i < agents.size(); i++) {
 			if(i != agents.size() - 1)
-				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage();
+				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage() + ",";
 			else
 				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage() + ";";
 		}

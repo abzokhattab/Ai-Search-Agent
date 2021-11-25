@@ -57,7 +57,7 @@ public class StateSpace extends SearchProblem{
 		
 		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, new ArrayList<Hostage>(), false, 0, m, n);
 		System.out.println("initialState " + initialState);
-		operators = new String[]{"up", "down", "left", "right", "carry", "drop", "takePill", "kill", "fly"};
+		operators = new String[]{"up", "down", "right", "left", "drop", "fly", "takePill", "kill"};
 	
 
 
@@ -80,7 +80,7 @@ public class StateSpace extends SearchProblem{
 	}
 	public Hostage canCarry(Point neo, ArrayList<Hostage> hostages) {
 		for(int i = 0; i < hostages.size(); i++) {
-			if(neo.x == hostages.get(i).x && neo.y == hostages.get(i).y)
+			if(neo.x == hostages.get(i).x && neo.y == hostages.get(i).y && !hostages.get(i).isSaved())
 				return hostages.get(i);
 		}
 		return new Hostage(-1, -1, -1);
@@ -92,10 +92,10 @@ public class StateSpace extends SearchProblem{
 		}
 		return new Point(-1, -1);
 	}
-	public boolean killAgents(Point neo, ArrayList<Agent> agents, int damage) {
+	public int killAgents(Point neo, ArrayList<Agent> agents, int damage) {
 		boolean killed = false;
 		if(damage + 20 >= 100) {
-			return false; 
+			return damage; 
 		}
 		for(int i = 0; i < agents.size(); i++) {
 			if(( (neo.x + 1 == agents.get(i).x && neo.y == agents.get(i).y ) || (neo.x - 1 == agents.get(i).x && neo.y == agents.get(i).y)
@@ -108,7 +108,7 @@ public class StateSpace extends SearchProblem{
 		if(killed) {
 			damage += 20;
 		}
-		return killed;
+		return damage;
 
 	}
 	public void timeStep(boolean pillCycle, ArrayList<Hostage> hostages, ArrayList<Hostage> carriedHostages, ArrayList<Agent> agents) {
@@ -156,8 +156,8 @@ public class StateSpace extends SearchProblem{
 		int damage = ((NeoState) node.state).getDamage();
 		deadHostages = 0;
 		deadAgents = 0;
-//		if(damage >= 100) 
-//			return false;
+		if(damage >= 100) 
+			return false;
 		if(carriedHostages.size() != 0)
 			return false;
 		if(!neo.equals(telephoneBooth))
@@ -176,10 +176,10 @@ public class StateSpace extends SearchProblem{
 			if(agents.get(i).isHostage() && agents.get(i).isKilled())
 				deadHostages++;
 		}
-		//System.out.println(states.toString());
+//		System.out.println(states.toString());
 		return true;
 	}
-	@Override
+	@Override 
 	public State transitionFunction(State state, String operator) {
 //		System.out.print(operator);
 //		System.out.println(state.toString());
@@ -197,16 +197,19 @@ public class StateSpace extends SearchProblem{
 		ArrayList<Hostage> hostages = new ArrayList<Hostage>();
 		ArrayList<Hostage> carriedHostages = new ArrayList<Hostage>();
 		for(int i = 0; i < agentsOriginal.size(); i++) {
-			Agent currentAgent = new Agent(agentsOriginal.get(i).x, agentsOriginal.get(i).y, agentsOriginal.get(i).isKilled());
-			if(agentsOriginal.get(i).isHostage())
-				currentAgent.setHostage(true);
+			Agent currentAgent = new Agent(agentsOriginal.get(i).x, agentsOriginal.get(i).y, agentsOriginal.get(i).isHostage());
+			if(agentsOriginal.get(i).isKilled())
+				currentAgent.setKilled(true);
 			agents.add(currentAgent);
 		}
 		for(int i = 0; i < pillsOriginal.size(); i++) {
 			pills.add(new Point(pillsOriginal.get(i).x, pillsOriginal.get(i).y));
 		}
 		for(int i = 0; i < hostagesOriginal.size(); i++) {
-			hostages.add(new Hostage(hostagesOriginal.get(i).x, hostagesOriginal.get(i).y, hostagesOriginal.get(i).getDamage()));
+			Hostage currentHostage = new Hostage(hostagesOriginal.get(i).x, hostagesOriginal.get(i).y, hostagesOriginal.get(i).getDamage());
+			if(hostagesOriginal.get(i).isSaved())
+				currentHostage.setSaved(true);
+			hostages.add(currentHostage);
 		}
 		for(int i = 0; i < carriedHostagesOriginal.size(); i++) {
 			carriedHostages.add(new Hostage(carriedHostagesOriginal.get(i).x, carriedHostagesOriginal.get(i).y, carriedHostagesOriginal.get(i).getDamage()));
@@ -323,10 +326,10 @@ public class StateSpace extends SearchProblem{
 				return null;			
 			}
 			case "kill": { 
-				 boolean kill = killAgents(neo, agents, damage);
-				 if(kill) {
+				 int newDamage = killAgents(neo, agents, damage);
+				 if(damage != newDamage) {
 					 timeStep(false, hostages, carriedHostages, agents);
-					 State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
+					 State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, newDamage, m, n);
 					 if(states.containsKey(newState.toString())) {
 							return null;
 					 }
