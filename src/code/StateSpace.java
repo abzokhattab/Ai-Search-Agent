@@ -2,6 +2,7 @@ package code;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class StateSpace extends SearchProblem{
 	int m;
@@ -29,38 +30,42 @@ public class StateSpace extends SearchProblem{
 		// positions of agents
 		String[] agentSplit = g[4].split(",");
 		ArrayList<Agent> agents = new ArrayList<Agent>();
-		for(int i=0; i< agentSplit.length; i = i+2){
+		for(int i = 0; i < agentSplit.length; i = i + 2){
 			agents.add(new Agent(Integer.parseInt(agentSplit[i]),Integer.parseInt(agentSplit[i+1]), false));
 		}
 		
 		// positions of pills
 		String[] pillSplit = g[5].split(",");
 		ArrayList<Point> pills = new ArrayList<Point>();
-		for(int i=0; i< pillSplit.length; i = i+2){
+		for(int i=0; i< pillSplit.length; i = i + 2){
 			pills.add(new Point(Integer.parseInt(pillSplit[i]),Integer.parseInt(pillSplit[i+1])));
 		}
 		
 		// positions of pads
 		String[] padSplit = g[6].split(",");
 		ArrayList<Pad> pads = new ArrayList<Pad>();
-		for(int i = 0; i < padSplit.length ; i = i+4){
+		for(int i = 0; i < padSplit.length ; i = i + 4){
 			pads.add(new Pad (new Point(Integer.parseInt(padSplit[i]), Integer.parseInt(padSplit[i+1])), 
 					new Point(Integer.parseInt(padSplit[i+2]), Integer.parseInt(padSplit[i+3]))));
+			pads.add(new Pad (new Point (Integer.parseInt(padSplit[i+2]), Integer.parseInt(padSplit[i+3])), 
+					new Point(Integer.parseInt(padSplit[i]), Integer.parseInt(padSplit[i+1]))));
 		}
+		
 		
 		// positions of hostages
 		String[] hostageSplit = g[7].split(",");
 		ArrayList<Hostage> hostages = new ArrayList<Hostage>();
-		for(int i=0; i< hostageSplit.length; i = i+3){
+		for(int i = 0; i < hostageSplit.length; i = i + 3){
 			hostages.add(new Hostage(Integer.parseInt(hostageSplit[i]), Integer.parseInt(hostageSplit[i+1]), Integer.parseInt(hostageSplit[i+2])));
 		}
 		
 		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, new ArrayList<Hostage>(), false, 0, m, n);
+		System.out.println("initialState " + initialState);
 		operators = new String[]{"up", "down", "left", "right", "carry", "drop", "takePill", "kill", "fly"};
 	}
 	public boolean agentCollision(ArrayList<Agent> agents, Point neo) {
 		for(int i = 0; i < agents.size(); i++) {
-			if(neo.x == agents.get(i).x && neo.y == agents.get(i).y)
+			if(neo.x == agents.get(i).x && neo.y == agents.get(i).y && !agents.get(i).isKilled())
 				return true;
 		}
 		return false;
@@ -85,8 +90,8 @@ public class StateSpace extends SearchProblem{
 			return false; 
 		}
 		for(int i = 0; i < agents.size(); i++) {
-			if(((neo.x + 1 == agents.get(i).x && neo.y == agents.get(i).y ) || (neo.x - 1 == agents.get(i).x && neo.y == agents.get(i).y)
-					|| (neo.x == agents.get(i).x && neo.y + 1 == agents.get(i).y) || (neo.x == agents.get(i).x && neo.y - 1 == agents.get(i).y)) 
+			if(( (neo.x + 1 == agents.get(i).x && neo.y == agents.get(i).y ) || (neo.x - 1 == agents.get(i).x && neo.y == agents.get(i).y)
+					|| (neo.x == agents.get(i).x && neo.y + 1 == agents.get(i).y) || (neo.x == agents.get(i).x && neo.y - 1 == agents.get(i).y) ) 
 					&& !agents.get(i).isKilled()) {				
 				agents.get(i).setKilled(true);
 				killed = true;
@@ -164,21 +169,45 @@ public class StateSpace extends SearchProblem{
 				deadHostages++;
 			
 		}
-		System.out.println(neo.x + " " + neo.y + " " + telephoneBooth.x + " " + telephoneBooth.y);
+		//System.out.println(states.toString());
 		return true;
 	}
 	@Override
 	public State transitionFunction(State state, String operator) {
-		System.out.println(operator);
-		Point neo = ((NeoState) state).getNeo();		
+		//System.out.println(operator);
+		Point neoOriginal = ((NeoState) state).getNeo();	
 		int c = ((NeoState) state).getC();
 		boolean tookPill = ((NeoState) state).isTookPill();
 		Point telephoneBooth = ((NeoState) state).getTelephoneBooth();
-		ArrayList<Agent> agents = ((NeoState) state).getAgents();
-		ArrayList<Point> pills = ((NeoState) state).getPills(); 
-		ArrayList<Pad> pads = ((NeoState) state).getPads(); 
-		ArrayList<Hostage> hostages = ((NeoState) state).getHostages();
-		ArrayList<Hostage> carriedHostages = ((NeoState) state).getCarriedHostages();
+		ArrayList<Agent> agentsOriginal = ((NeoState) state).getAgents();
+		ArrayList<Point> pillsOriginal = ((NeoState) state).getPills(); 
+		ArrayList<Pad> padsOriginal = ((NeoState) state).getPads(); 
+		ArrayList<Hostage> hostagesOriginal = ((NeoState) state).getHostages();
+		ArrayList<Hostage> carriedHostagesOriginal = ((NeoState) state).getCarriedHostages();
+		ArrayList<Agent> agents = new ArrayList<Agent>();
+		ArrayList<Point> pills = new ArrayList<Point>();
+		ArrayList<Pad> pads = new ArrayList<Pad>();
+		ArrayList<Hostage> hostages = new ArrayList<Hostage>();
+		ArrayList<Hostage> carriedHostages = new ArrayList<Hostage>();
+		for(int i = 0; i < agentsOriginal.size(); i++) {
+			Agent currentAgent = new Agent(agentsOriginal.get(i).x, agentsOriginal.get(i).y, agentsOriginal.get(i).isKilled());
+			if(agentsOriginal.get(i).isHostage())
+				currentAgent.setHostage(true);
+			agents.add(currentAgent);
+		}
+		for(int i = 0; i < pillsOriginal.size(); i++) {
+			pills.add(new Point(pillsOriginal.get(i).x, pillsOriginal.get(i).y));
+		}
+		for(int i = 0; i < hostagesOriginal.size(); i++) {
+			hostages.add(new Hostage(hostagesOriginal.get(i).x, hostagesOriginal.get(i).y, hostagesOriginal.get(i).getDamage()));
+		}
+		for(int i = 0; i < carriedHostagesOriginal.size(); i++) {
+			carriedHostages.add(new Hostage(carriedHostagesOriginal.get(i).x, carriedHostagesOriginal.get(i).y, carriedHostagesOriginal.get(i).getDamage()));
+		}
+		for(int i = 0; i < padsOriginal.size(); i++) {
+			pads.add(new Pad(padsOriginal.get(i).startPad, padsOriginal.get(i).finishPad));
+		}
+		Point neo = new Point(neoOriginal.x, neoOriginal.y);
 		int damage = ((NeoState) state).getDamage();
 		
 		switch(operator) {
@@ -197,7 +226,7 @@ public class StateSpace extends SearchProblem{
 			}
 			case "down": {
 				Point newPosition = new Point(neo.x + 1, neo.y);
-				if(newPosition.x <= m && !agentCollision(agents, newPosition)) {
+				if(newPosition.x < m && !agentCollision(agents, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
 					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
 					if(states.containsKey(newState.toString())){
@@ -223,7 +252,7 @@ public class StateSpace extends SearchProblem{
 			}
 			case "right": {
 				Point newPosition = new Point(neo.x, neo.y + 1);
-				if(newPosition.y <= n && !agentCollision(agents, newPosition)) {
+				if(newPosition.y < n && !agentCollision(agents, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
 					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
 					if(states.containsKey(newState.toString())){

@@ -34,7 +34,8 @@ public class NeoState extends State{
 		this.grid = new String[m][n];
 		this.heuristicOne=heuristicFunction();
 		this.heuristicTwo=heuristicFunction();
-		
+		populateGrid();
+
 	}
 	
 	public int heuristicFunction() {
@@ -51,45 +52,76 @@ public class NeoState extends State{
 	@Override
 	public String toString() {
 		String result = "";
-		result +=  neo.x + "," + neo.y + ";";
-		result += c + ";";
-		result += telephoneBooth.x + "," + telephoneBooth.y + ";";
+		result += "N" + neo.x + "," + neo.y + ";";
+		//result += c + ";";
+		result += "TB" + telephoneBooth.x + "," + telephoneBooth.y + "; A";
 		for(int i = 0; i < agents.size(); i++) {
 			if(i != agents.size() - 1)
-				result += agents.get(i).x + "," + agents.get(i).y + ",";
-			result += agents.get(i).x + "," + agents.get(i).y + ";";
+				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage();
+			else
+				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage() + ";";
 		}
+		result += " P";
 		for(int i = 0; i < pills.size(); i++) {
 			if(i != pills.size() - 1)
 				result += pills.get(i).x + "," + pills.get(i).y + ",";
-			result += pills.get(i).x + "," + pills.get(i).y + ";";	
+			else
+				result += pills.get(i).x + "," + pills.get(i).y + ";";	
 		}
-		for(int i = 0; i < pads.size(); i++) {
-			if(i != pads.size() - 1)
-				result += pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + "," + pads.get(i).getFinishPad().x + "," + pads.get(i).getFinishPad().y + ",";
-			result += pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + "," + pads.get(i).getFinishPad().x + "," + pads.get(i).getFinishPad().y + ";";
-		}
+		result += " PAD";
+
+//		for(int i = 0; i < pads.size(); i+=2) {
+//			if(i != pads.size() - 1)
+//				result += pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + "," + pads.get(i).getFinishPad().x + "," + pads.get(i).getFinishPad().y + ",";
+//			else
+//				result += pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + "," + pads.get(i).getFinishPad().x + "," + pads.get(i).getFinishPad().y + ";";
+//		}
+		result += " H";
+
 		for(int i = 0; i < hostages.size(); i++) {
 			if(i != hostages.size() - 1)
-				result += hostages.get(i).x + "," + hostages.get(i).y + ",";
-			result += hostages.get(i).x + "," + hostages.get(i).y + ";";
+				result += hostages.get(i).x + "," + hostages.get(i).y + "," + hostages.get(i).getDamage() + ",";
+			else
+				result += hostages.get(i).x + "," + hostages.get(i).y + "," + hostages.get(i).getDamage() + ";";
 		}
+		result += " CH";
+
 		for(int i = 0; i < carriedHostages.size(); i++) {
 			if(i != carriedHostages.size() - 1)
-				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + ",";
-			result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + ";";
+				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + "," + carriedHostages.get(i).getDamage() + ",";
+			else
+				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + "," + carriedHostages.get(i).getDamage() + ";" ;
 		}
-		
+		result += " D";
+
 		result +=  damage + ";" + tookPill + ";";
 		
 		return result;
+//		for (int i = 0; i < grid.length; i++) {
+//			for (int j = 0; j < grid[i].length; j++) {
+//				if(grid[i][j] == null)
+//					grid[i][j] = "e";
+//				result += " " + grid[i][j] + " |";
+//			}
+//			result += '\n';
+//		}
+//		result += '\n';
+//		return result;
 	}
 	public void visaulizeState() {
-		
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[i].length; j++) {
+				if(grid[i][j] == null)
+					grid[i][j] = "e";
+				System.out.print(" " + grid[i][j] + " ");
+				System.out.print("|");
+			}
+			System.out.println("");
+			System.out.println("");
+		}
 	}
 	public void populateGrid() {
-		grid[neo.x][neo.y] = "N";
-		grid[telephoneBooth.x][telephoneBooth.y] = "TB";
+		
 		for(int i = 0; i < agents.size(); i++) {
 			Agent agent = agents.get(i);
 			grid[agent.x][agent.y] = "A";
@@ -110,6 +142,8 @@ public class NeoState extends State{
 			grid[hostage.x][hostage.y] = "H (" + hostage.getDamage() + ")";
 
 		}
+		grid[neo.x][neo.y] = "N";
+		grid[telephoneBooth.x][telephoneBooth.y] = "TB";
 	}
 	public Point getNeo() {
 		return neo;
@@ -187,9 +221,6 @@ public class NeoState extends State{
 		this.tookPill = tookPill;
 	}
 
-	public static void main(String[]args) {
-		
-	}
 }
 
 

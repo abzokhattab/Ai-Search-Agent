@@ -42,16 +42,25 @@ public class Matrix {
 		StateSpace tree = new StateSpace(grid);
 		SearchTreeNode node = tree.generalSearch(strategy);
 		String result = "";
+		String visualization = "";
 		if(node != null){
 			//int pathcost = node.pathCost;
 			//result += "snap";
 			while(node.parent != null){
 				result = node.operator + "," + result;
+				if(visualize) {
+					((NeoState) node.state).visaulizeState();
+				}
+				System.out.println(node.state);
 				node = node.parent;
+				
 			}
-			result += ";" + tree.deadHostages + ";" + tree.deadAgents + ";" + tree.nodesExpanded;
+			
+			result = result.substring(0,result.length()-1) + ";" + tree.deadHostages + ";" + tree.deadAgents + ";" + tree.nodesExpanded;
 		}
-		
+		System.out.println(result);
+		System.out.println();
+
 		return result;
 	}
 	void initalizeNeo() {
@@ -205,7 +214,7 @@ public class Matrix {
 //		System.out.println("Pad Pairs: " + maze.padPairs);
 		System.out.println("Hostages: " + maze.hostages);
 //		System.out.println(maze.gridString);
-		String s = solve(maze.gridString,"UC",false);
+		String s = solve(maze.gridString,"BF",false);
 		System.out.println(s);
 //		System.out.println("Hello");
 //		Random random = new Random();
