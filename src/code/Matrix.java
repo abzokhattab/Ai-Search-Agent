@@ -42,10 +42,7 @@ public class Matrix {
 		StateSpace tree = new StateSpace(grid);
 		SearchTreeNode node = tree.generalSearch(strategy);
 		String result = "";
-		String visualization = "";
-		if(node != null){
-			//int pathcost = node.pathCost;
-			//result += "snap";
+		if(node != null) {
 			while(node.parent != null){
 				result = node.operator + "," + result;
 				System.out.println(node.state);
@@ -54,6 +51,9 @@ public class Matrix {
 			}
 			
 			result = result.substring(0,result.length()-1) + ";" + tree.deadHostages + ";" + tree.deadAgents + ";" + tree.nodesExpanded;
+		}
+		else {
+			result = "No Solution";
 		}
 		System.out.println(result);
 		System.out.println();

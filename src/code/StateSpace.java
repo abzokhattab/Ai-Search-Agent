@@ -57,11 +57,8 @@ public class StateSpace extends SearchProblem{
 		
 		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, new ArrayList<Hostage>(), false, 0, m, n);
 		System.out.println("initialState " + initialState);
-		operators = new String[]{"up", "down", "right", "left", "drop", "fly", "takePill", "kill"};
+		operators = new String[]{"up", "down", "right", "left", "carry", "drop", "kill", "takePill", "fly"};
 	
-
-
-//		
 //		String[] hstg = gridArray[7].split(",");
 //		HashMap<String,Integer> m7 = new HashMap<String,Integer>();
 //		for(int i = 0;i< hstg.length -2; i+=3) {
