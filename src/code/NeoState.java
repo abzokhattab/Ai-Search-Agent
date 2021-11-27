@@ -54,8 +54,9 @@ public class NeoState extends State{
 	public String toString() {
 		String result = "";
 		result += "N" + neo.x + "," + neo.y + ";";
-		result += c + ";";
-		result += "TB" + telephoneBooth.x + "," + telephoneBooth.y + "; A";
+//		result += c + ";";
+		result += "TB" + telephoneBooth.x + "," + telephoneBooth.y + ";";
+		result += " A";
 		for(int i = 0; i < agents.size(); i++) {
 			if(i != agents.size() - 1)
 				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage() + ",";
@@ -87,59 +88,98 @@ public class NeoState extends State{
 
 		for(int i = 0; i < hostages.size(); i++) {
 			if(i != hostages.size() - 1)
-				result += hostages.get(i).x + "," + hostages.get(i).y + "," + hostages.get(i).getDamage() + ",";
+				result += hostages.get(i).x + "," + hostages.get(i).y + ",";
 			else
-				result += hostages.get(i).x + "," + hostages.get(i).y + "," + hostages.get(i).getDamage() + ";";
+				result += hostages.get(i).x + "," + hostages.get(i).y + ";";
 		}
 		result += " CH";
 
 		for(int i = 0; i < carriedHostages.size(); i++) {
 			if(i != carriedHostages.size() - 1)
-				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + "," + carriedHostages.get(i).getDamage() + ",";
+				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + ",";
 			else
-				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + "," + carriedHostages.get(i).getDamage() + ";" ;
+				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + ";" ;
 		}
 		result += " D";
 
 		result +=  damage + ";" + tookPill + ";";
 		
 		return result;
-//		for (int i = 0; i < grid.length; i++) {
-//			for (int j = 0; j < grid[i].length; j++) {
-//				if(grid[i][j] == null)
-//					grid[i][j] = "e";
-//				result += " " + grid[i][j] + " |";
-//			}
-//			result += '\n';
-//		}
-//		result += '\n';
-//		return result;
 	}
-//	public void populateGrid() {
-//		
-//		for(int i = 0; i < agents.size(); i++) {
-//			Agent agent = agents.get(i);
-//			grid[agent.x][agent.y] = "A";
-//		}
-//		for(int i = 0; i < pills.size(); i++) {
-//			Point pill = pills.get(i);
-//			grid[pill.x][pill.y] = "P";
-//		}
-//		for(int i = 0; i < pads.size(); i += 2) {
-//			Point pad1 = pads.get(i).startPad;
-//			Point pad2 = pads.get(i).finishPad;
-//			grid[pad1.x][pad1.y] = "Pad1 (" + pad1.x + ", " + pad1.y + ")";
-//			grid[pad2.x][pad2.y] = "Pad1 (" + pad2.x + ", " + pad2.y + ")";
-//			
-//		}
-//		for(int i = 0; i < hostages.size(); i++) {
-//			Hostage hostage = hostages.get(i);
-//			grid[hostage.x][hostage.y] = "H (" + hostage.getDamage() + ")";
-//
-//		}
-//		grid[neo.x][neo.y] = "N";
-//		grid[telephoneBooth.x][telephoneBooth.y] = "TB";
-//	}
+	public String populateGrid() {
+		for(int i = 0; i < agents.size(); i++) {
+			Agent agent = agents.get(i);
+			if(!agent.isKilled())
+				grid[agent.x][agent.y] = "        A        ";
+		}
+		for(int i = 0; i < pills.size(); i++) {
+			Point pill = pills.get(i);
+			grid[pill.x][pill.y] = "        P        ";
+		}
+		for (String name: pads.keySet()) {
+			int i = 0;
+		    String key = name.toString();
+		    String value = pads.get(name).toString();
+		    String[] pad1 = key.split(",");
+		    String[] pad2 = value.split(",");
+		    if(i > 9) {
+		    	if ((Integer.parseInt(pad1[0]) > 9 && Integer.parseInt(pad1[0]) < 10) || (Integer.parseInt(pad1[0]) < 10 && Integer.parseInt(pad1[0]) > 9)) {
+		    		grid[Integer.parseInt(pad1[0])][Integer.parseInt(pad1[1])] = "  Pad" + i + " (" + key + ")   ";
+				    grid[Integer.parseInt(pad2[0])][Integer.parseInt(pad2[1])] = "  Pad" + i + " (" + value + ")   ";
+		    	}
+		    	
+		    	else if(Integer.parseInt(pad1[0]) > 9 && Integer.parseInt(pad1[0]) > 9) {
+		    		grid[Integer.parseInt(pad1[0])][Integer.parseInt(pad1[1])] = "  Pad" + i + " (" + key + ")  ";
+				    grid[Integer.parseInt(pad2[0])][Integer.parseInt(pad2[1])] = "  Pad" + i + " (" + value + ")  ";
+		    	}
+		    		
+			    else {
+			    	grid[Integer.parseInt(pad1[0])][Integer.parseInt(pad1[1])] = "   Pad" + i + " (" + key + ")   ";
+				    grid[Integer.parseInt(pad2[0])][Integer.parseInt(pad2[1])] = "   Pad" + i + " (" + value + ")   ";
+			    }
+		    }
+		    else {
+		    	if ((Integer.parseInt(pad1[0]) > 9 && Integer.parseInt(pad1[0]) < 10) || (Integer.parseInt(pad1[0]) < 10 && Integer.parseInt(pad1[0]) > 9)) {
+		    		grid[Integer.parseInt(pad1[0])][Integer.parseInt(pad1[1])] = "   Pad" + i + " (" + key + ")   ";
+				    grid[Integer.parseInt(pad2[0])][Integer.parseInt(pad2[1])] = "   Pad" + i + " (" + value + ")   ";
+		    	}
+		    	
+		    	else if(Integer.parseInt(pad1[0]) > 9 && Integer.parseInt(pad1[0]) > 9) {
+		    		grid[Integer.parseInt(pad1[0])][Integer.parseInt(pad1[1])] = "  Pad" + i + " (" + key + ")   ";
+				    grid[Integer.parseInt(pad2[0])][Integer.parseInt(pad2[1])] = "  Pad" + i + " (" + value + ")   ";
+		    	}
+		    		
+			    else {
+			    	grid[Integer.parseInt(pad1[0])][Integer.parseInt(pad1[1])] = "   Pad" + i + " (" + key + ")    ";
+				    grid[Integer.parseInt(pad2[0])][Integer.parseInt(pad2[1])] = "   Pad" + i + " (" + value + ")    ";
+			    }
+		    }
+		    
+		}
+		for(int i = 0; i < hostages.size(); i++) {
+			Hostage hostage = hostages.get(i);
+			if(hostage.getDamage() < 10)
+				grid[hostage.x][hostage.y] = "      H (" + hostage.getDamage() + ")      ";
+			else
+				grid[hostage.x][hostage.y] = "     H (" + hostage.getDamage() + ")      ";
+		}
+		grid[telephoneBooth.x][telephoneBooth.y] = "       TB        ";
+		grid[neo.x][neo.y] = "        N        ";
+		String result = "";
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[i].length; j++) {
+				if(grid[i][j] == null)
+					grid[i][j] = "                 ";
+				result += " " + grid[i][j] + " |";
+			}
+			result += "\n\n";
+		}
+		for (int j = 0; j < grid[0].length; j++) {
+			result += "++++++++++++++++++++";
+		}
+		result += "\n\n";
+		return result;
+	}
 	public Point getNeo() {
 		return neo;
 	}

@@ -11,6 +11,7 @@ public abstract class SearchProblem {
 	int currlevel = 0;
 	int deadHostages = 0;
 	int deadAgents = 0;
+	int count = 0;
 	Hashtable<String, String> states = new Hashtable<String, String>();
 	
 	public abstract boolean goalTest(SearchTreeNode node);
@@ -34,6 +35,7 @@ public abstract class SearchProblem {
 		switch(strategy){
 		case "BF":{
 			 oldNodes.addAll(newNodes);
+			 count++;
 			 return oldNodes;
 		}
 		case "DF":{
@@ -147,6 +149,8 @@ public static ArrayList<SearchTreeNode> sortAHeuristicTwo(ArrayList<SearchTreeNo
 			if(this.goalTest(node)){
 				return node;
 			}
+			if(count == 10000000)
+				System.exit(0);
 			nodes = qingFunction(strategy, nodes, expand(node));
 		}	
 		return null;

@@ -82,12 +82,14 @@ public class StateSpace extends SearchProblem{
 		}
 		return new Hostage(-1, -1, -1);
 	}
-	public Point takePill(Point neo, ArrayList<Point> pills) {
+	public int takePill(Point neo, ArrayList<Point> pills, int damage) {
 		for(int i = 0; i < pills.size(); i++) {
-			if(neo.x == pills.get(i).x && neo.y == pills.get(i).y)
-				return pills.get(i);
+			if(neo.x == pills.get(i).x && neo.y == pills.get(i).y) {
+				pills.remove(i);
+				return damage - 20;
+			}
 		}
-		return new Point(-1, -1);
+		return damage;
 	}
 	public int killAgents(Point neo, ArrayList<Agent> agents, int damage) {
 		boolean killed = false;
@@ -122,6 +124,7 @@ public class StateSpace extends SearchProblem{
 				if(currentDamage >= 100 && !hostages.get(i).isSaved()) {
 					agents.add(new Agent(hostages.get(i).x, hostages.get(i).y, true));
 					hostages.remove(i);
+					i--;
 				}
 				else
 					hostages.get(i).setDamage(currentDamage);
@@ -139,6 +142,8 @@ public class StateSpace extends SearchProblem{
 			}
 			else
 				currentDamage += 2;
+			if(currentDamage >= 100)
+				currentDamage = 100;
 			
 			carriedHostages.get(i).setDamage(currentDamage);
 		}
@@ -178,7 +183,7 @@ public class StateSpace extends SearchProblem{
 	}
 	@Override 
 	public State transitionFunction(State state, String operator) {
-//		System.out.print(operator);
+//		System.out.print(operator + " ");
 //		System.out.println(state.toString());
 		Point neoOriginal = ((NeoState) state).getNeo();	
 		int c = ((NeoState) state).getC();
@@ -224,6 +229,11 @@ public class StateSpace extends SearchProblem{
 						return null;
 					}
 					states.put(newState.toString(), "");
+//					if(count > 25) {
+//						System.out.print(operator + " level" + count + " ");
+//						System.out.println(newState.toString());
+//					}
+					
 					return newState;
 				}
 				return null; // no change
@@ -237,6 +247,10 @@ public class StateSpace extends SearchProblem{
 						return null;
 					}
 					states.put(newState.toString(), "");
+//					if(count == 1370 && newPosition.x == 4 && newPosition.y == 0) {
+//						System.out.print(operator + " level" + count + " ");
+//						System.out.println(newState.toString());
+//					}
 					return newState;
 				}
 				return null; // no change
@@ -250,6 +264,10 @@ public class StateSpace extends SearchProblem{
 						return null;
 					}
 					states.put(newState.toString(), "");
+					if(count == 610 && newPosition.x == 2 && newPosition.y == 0) {
+						System.out.print(operator + " level" + count + " ");
+						System.out.println(newState.toString());
+					}
 					return newState;
 				}
 				return null; // no change
@@ -263,6 +281,10 @@ public class StateSpace extends SearchProblem{
 						return null;
 					}
 					states.put(newState.toString(), "");
+//					if(count > 25) {
+//						System.out.print(operator + " level" + count + " ");
+//						System.out.println(newState.toString());
+//					}
 					return newState;
 				}
 				return null; // no change
@@ -281,6 +303,10 @@ public class StateSpace extends SearchProblem{
 						return null;
 					}
 					states.put(newState.toString(), "");
+//					if(count == 837 && neo.x == 2 && neo.y == 0) {
+//						System.out.print(operator + " level" + count + " ");
+//						System.out.println(newState.toString());
+//					}
 					return newState;
 				}
 				return null;
@@ -301,22 +327,30 @@ public class StateSpace extends SearchProblem{
 						return null;
 					}
 					states.put(newState.toString(), "");
+//					if(count > 25) {
+//						System.out.print(operator + " level" + count + " ");
+//						System.out.println(newState.toString());
+//					}
 					return newState;
 				}
 				return null;
 			}
 			case "takePill": {
 				if(!tookPill) {
-					Point pill = takePill(neo, pills);
-					if(!pill.equals(new Point(-1, -1))) {
-						int i = pills.indexOf(pill);
-						pills.remove(i);
+					int newDamage = takePill(neo, pills, damage);
+					if(damage != newDamage) {
+						if(newDamage < 0)
+							newDamage = 0;
 						timeStep(true, hostages, carriedHostages, agents);
-						State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, true, damage, m, n);
+						State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, true, newDamage, m, n);
 						if(states.containsKey(newState.toString())){
 							return null;
 						}
 						states.put(newState.toString(), "");
+//						if(count > 1362 && neo.x == 4 && neo.y == 0 && damage == 60) {
+//							System.out.print(operator + " level" + count + " ");
+//							System.out.println(newState.toString());
+//						}
 						return newState;
 					}
 				}
@@ -331,20 +365,29 @@ public class StateSpace extends SearchProblem{
 							return null;
 					 }
 					 states.put(newState.toString(), "");
+//						if(count == 270 && neo.x == 3 && neo.y == 1) {
+//							System.out.print(operator + " level" + count + " ");
+//							System.out.println(newState.toString());
+//						}
 					 return newState;
 				 }
 				 return null;
 			}
 			case "fly": {
-				String fly = pads.get(neo.x + "," + neo.y);
-				if(fly != null) {
-					Point newPosition = new Point(Integer.parseInt(fly.charAt(0) +""), Integer.parseInt(fly.charAt(2) +""));
+				String flySplit = pads.get(neo.x + "," + neo.y);
+				if(flySplit != null) {
+					String[] fly = flySplit.split(",");
+					Point newPosition = new Point(Integer.parseInt(fly[0]), Integer.parseInt(fly[1]));
 					timeStep(false, hostages, carriedHostages, agents);
 					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
-					states.put(newState.toString(), ""); 
+					states.put(newState.toString(), "");
+//					if(count > 25) {
+//						System.out.print(operator + " level" + count + " ");
+//						System.out.println(newState.toString());
+//					}
 					return newState;
 				}
 				return null;
