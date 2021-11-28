@@ -89,25 +89,32 @@ public abstract class SearchProblem {
 		}
 	}
 
-	public ArrayList<SearchTreeNode> sort(ArrayList<SearchTreeNode> nodes)  
-    { 
-        int n = nodes.size(); 
-        for (int i = 1; i < n; ++i) { 
-            int key = nodes.get(i).pathCost; 
-            int j = i - 1; 
-  
-            /* Move elements of arr[0..i-1], that are 
-               greater than key, to one position ahead 
-               of their current position */
-            while (j >= 0 && nodes.get(j).pathCost > key) { 
-            	nodes.get(j+1).pathCost = nodes.get(j).pathCost; 
-                j = j - 1; 
-            } 
-            nodes.get(j+1).pathCost= key; 
-            
-        }
-        return nodes;
-    }
+//	public ArrayList<SearchTreeNode> sort(ArrayList<SearchTreeNode> nodes)  
+//    { 
+//        int n = nodes.size(); 
+//        for (int i = 1; i < n; ++i) { 
+//            int key = nodes.get(i).pathCost; 
+//            int j = i - 1; 
+//  
+//            /* Move elements of arr[0..i-1], that are 
+//               greater than key, to one position ahead 
+//               of their current position */
+//            while (j >= 0 && nodes.get(j).pathCost > key) { 
+//            	nodes.get(j+1).pathCost = nodes.get(j).pathCost; 
+//                j = j - 1; 
+//            } 
+//            nodes.get(j+1).pathCost= key; 
+//            
+//        }
+//        return nodes;
+//    }
+	
+	public ArrayList<SearchTreeNode> sort(ArrayList<SearchTreeNode> nodes) {
+		
+		nodes.sort(Comparator.comparing(a ->a.pathCost));
+		return nodes;
+	}
+	
 	
 	public static ArrayList<SearchTreeNode> sortHeuristicOne(ArrayList<SearchTreeNode> nodes)  {
 		
