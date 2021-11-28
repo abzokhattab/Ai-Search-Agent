@@ -6,23 +6,30 @@ public class Matrix {
 		StateSpace tree = new StateSpace(grid);
 		SearchTreeNode node = tree.generalSearch(strategy);
 		String result = "";
-		String states = "";
+		String visualizeGrid = "";
 		String visualizeString = "";
+
 		if(node != null) {
 			while(node.parent != null) {
 				result = node.operator + "," + result;
 //				states = node.state + "\n" + states;
 				if(visualize)
-					visualizeString = ((NeoState) node.state).populateGrid() + visualizeString;
+					visualizeGrid = ((NeoState) node.state).populateGrid() + visualizeGrid;
+				visualizeString = node.operator + " " + ((NeoState) node.state).stringVisualization() + "\n" + visualizeString;
+//				System.out.println(node.operator);
+
 				node = node.parent;
 			}
+			visualizeString = "initial State " + ((NeoState) tree.initialState).stringVisualization() + "\n" + visualizeString;
+			if(visualize)
+				visualizeGrid = ((NeoState) tree.initialState).populateGrid() + visualizeGrid;
 			result = result.substring(0,result.length()-1) + ";" + tree.deadHostages + ";" + tree.deadAgents + ";" + tree.nodesExpanded;
 		}
 		else
 			result = "No Solution";
 		if(visualize)
-			System.out.println(visualizeString);
-//		System.out.println(states);
+			System.out.println(visualizeGrid);
+//		System.out.println(visualizeString);
 		System.out.println(result + "\n" );
 		return result;
 	}
@@ -39,7 +46,7 @@ public class Matrix {
 		System.out.println("Pad Pairs: " + maze.padPoints);
 		System.out.println("Hostages: " + maze.hostages);
 		System.out.println(maze.gridString);
-		String s = solve(maze.gridString,"BF",false);
+		String s = solve(maze.gridString, "ID",false);
 		System.out.println(s);
 //		System.out.println("Hello");
 //		Random random = new Random();

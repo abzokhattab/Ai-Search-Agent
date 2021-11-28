@@ -56,21 +56,18 @@ public class StateSpace extends SearchProblem{
 		}
 		
 		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, new ArrayList<Hostage>(), false, 0, m, n);
-		System.out.println("initialState " + initialState);
 		operators = new String[]{"up", "down", "right", "left", "carry", "drop", "kill", "takePill", "fly"};
-	
-//		String[] hstg = gridArray[7].split(",");
-//		HashMap<String,Integer> m7 = new HashMap<String,Integer>();
-//		for(int i = 0;i< hstg.length -2; i+=3) {
-//			m7.put(hstg[i]+","+hstg[i+1],Integer.parseInt(hstg[i+2]));
-//		}
-//		
-//		TH s = new TH(m,n,x10,x11,x00, x01,capacity, xyz,m4,m5,m7);
-//		boolean linkin = true;
 	}
 	public boolean agentCollision(ArrayList<Agent> agents, Point neo) {
 		for(int i = 0; i < agents.size(); i++) {
 			if(neo.x == agents.get(i).x && neo.y == agents.get(i).y && !agents.get(i).isKilled())
+				return true;
+		}
+		return false;
+	}
+	public boolean hostageCollision(ArrayList<Hostage> hostages, Point neo) {
+		for(int i = 0; i < hostages.size(); i++) {
+			if(neo.x == hostages.get(i).x && neo.y == hostages.get(i).y && hostages.get(i).getDamage() >= 98)
 				return true;
 		}
 		return false;
@@ -114,10 +111,12 @@ public class StateSpace extends SearchProblem{
 		for(int i = 0; i < hostages.size(); i++) {
 			int currentDamage = hostages.get(i).getDamage();
 			if(pillCycle) {
-				currentDamage -= 20;
-				if(currentDamage < 0)
-					currentDamage = 0;
-				hostages.get(i).setDamage(currentDamage);
+				if(hostages.get(i).getDamage() < 100) {
+					currentDamage -= 20;
+					if(currentDamage < 0)
+						currentDamage = 0;
+					hostages.get(i).setDamage(currentDamage);
+			}
 			}
 			else {
 				currentDamage +=  2;
@@ -126,7 +125,7 @@ public class StateSpace extends SearchProblem{
 					hostages.remove(i);
 					i--;
 				}
-				else
+				else if(!hostages.get(i).isSaved())
 					hostages.get(i).setDamage(currentDamage);
 			}
 					
@@ -140,11 +139,11 @@ public class StateSpace extends SearchProblem{
 						currentDamage = 0;
 				}
 			}
-			else
+			else {
 				currentDamage += 2;
-			if(currentDamage >= 100)
-				currentDamage = 100;
-			
+				if(currentDamage >= 100)
+					currentDamage = 100;
+			}
 			carriedHostages.get(i).setDamage(currentDamage);
 		}
 	}
@@ -178,7 +177,6 @@ public class StateSpace extends SearchProblem{
 			if(agents.get(i).isHostage() && agents.get(i).isKilled())
 				deadHostages++;
 		}
-//		System.out.println(states.toString());
 		return true;
 	}
 	@Override 
@@ -222,7 +220,7 @@ public class StateSpace extends SearchProblem{
 		switch(operator) {
 			case "up" : {
 				Point newPosition = new Point(neo.x - 1, neo.y);
-				if(newPosition.x >= 0 && !agentCollision(agents, newPosition)) {
+				if(newPosition.x >= 0 && !agentCollision(agents, newPosition) && !hostageCollision(hostages, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
 					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
 					if(states.containsKey(newState.toString())) {
@@ -233,14 +231,13 @@ public class StateSpace extends SearchProblem{
 //						System.out.print(operator + " level" + count + " ");
 //						System.out.println(newState.toString());
 //					}
-					
 					return newState;
 				}
 				return null; // no change
 			}
 			case "down": {
 				Point newPosition = new Point(neo.x + 1, neo.y);
-				if(newPosition.x < m && !agentCollision(agents, newPosition)) {
+				if(newPosition.x < m && !agentCollision(agents, newPosition) && !hostageCollision(hostages, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
 					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
 					if(states.containsKey(newState.toString())){
@@ -257,24 +254,24 @@ public class StateSpace extends SearchProblem{
 			}
 			case "left": {
 				Point newPosition = new Point(neo.x, neo.y - 1);
-				if(newPosition.y >= 0 && !agentCollision(agents, newPosition)) {
+				if(newPosition.y >= 0 && !agentCollision(agents, newPosition) && !hostageCollision(hostages, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
 					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
 					states.put(newState.toString(), "");
-					if(count == 610 && newPosition.x == 2 && newPosition.y == 0) {
-						System.out.print(operator + " level" + count + " ");
-						System.out.println(newState.toString());
-					}
+//					if(count == 610 && newPosition.x == 2 && newPosition.y == 0) {
+//						System.out.print(operator + " level" + count + " ");
+//						System.out.println(newState.toString());
+//					}
 					return newState;
 				}
 				return null; // no change
 			}
 			case "right": {
 				Point newPosition = new Point(neo.x, neo.y + 1);
-				if(newPosition.y < n && !agentCollision(agents, newPosition)) {
+				if(newPosition.y < n && !agentCollision(agents, newPosition) && !hostageCollision(hostages, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
 					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n);
 					if(states.containsKey(newState.toString())){
@@ -343,6 +340,7 @@ public class StateSpace extends SearchProblem{
 							newDamage = 0;
 						timeStep(true, hostages, carriedHostages, agents);
 						State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, true, newDamage, m, n);
+						((NeoState) newState).setPill(true);
 						if(states.containsKey(newState.toString())){
 							return null;
 						}
@@ -358,7 +356,7 @@ public class StateSpace extends SearchProblem{
 			}
 			case "kill": { 
 				 int newDamage = killAgents(neo, agents, damage);
-				 if(damage != newDamage) {
+				 if(damage != newDamage && !hostageCollision(hostages, neo)) {
 					 timeStep(false, hostages, carriedHostages, agents);
 					 State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, newDamage, m, n);
 					 if(states.containsKey(newState.toString())) {

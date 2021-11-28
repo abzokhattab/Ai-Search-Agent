@@ -38,7 +38,6 @@ public class NeoState extends State{
 		this.grid = new String[m][n];
 		this.heuristicOne=heuristicFunction();
 		this.heuristicTwo=heuristicFunction();
-		//populateGrid();
 
 	}
 	
@@ -46,9 +45,7 @@ public class NeoState extends State{
 		int hostageAgent=0;
 		for(int i=0;i<agents.size();i++) {
 			if(agents.get(i).hostage)
-				hostageAgent++;
-	
-				
+				hostageAgent++;				
 		}
 		
 		int pillCost=2;
@@ -67,7 +64,6 @@ public class NeoState extends State{
 	public int heuristicFunction() {
 		if(goalTest())
 			return 0;
-			
 		
 		int distance =calEuclideanDistance(this.neo.x,this.neo.y,this.telephoneBooth.x,this.telephoneBooth.y);
 		if(distance==0)
@@ -148,27 +144,7 @@ public class NeoState extends State{
 			else
 				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage() + ";";
 		}
-//		result += " P";
-//		for(int i = 0; i < pills.size(); i++) {
-//			if(i != pills.size() - 1)
-//				result += pills.get(i).x + "," + pills.get(i).y + ",";
-//			else
-//				result += pills.get(i).x + "," + pills.get(i).y + ";";	
-//		}
-//		result += " PAD";
-//		for (String name: pads.keySet()) {
-//		    String key = name.toString();
-//		    String value = pads.get(name).toString();
-//		    result += key + "," + value + ",";
-//		}
-//		result = result.substring(0, result.length() - 1) + ";";
-//		
-//		for(int i = 0; i < pads.size(); i+=2) {
-//			if(i != pads.size() - 1)
-//				result += pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + "," + pads.get(i).getFinishPad().x + "," + pads.get(i).getFinishPad().y + ",";
-//			else
-//				result += pads.get(i).getStartPad().x + "," + pads.get(i).getStartPad().y + "," + pads.get(i).getFinishPad().x + "," + pads.get(i).getFinishPad().y + ";";
-//		}
+
 		result += " H";
 
 		for(int i = 0; i < hostages.size(); i++) {
@@ -265,6 +241,53 @@ public class NeoState extends State{
 		result += "\n\n";
 		return result;
 	}
+	public String stringVisualization() {
+		String result = "";
+		result += "N " + neo.x + "," + neo.y + ";";
+		result += "C " + c + ";";
+		result += "TB " + telephoneBooth.x + "," + telephoneBooth.y + ";";
+		result += " A ";
+		for(int i = 0; i < agents.size(); i++) {
+			if(i != agents.size() - 1)
+				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage() + ",";
+			else
+				result += agents.get(i).x + "," + agents.get(i).y + "," + agents.get(i).isKilled() + "," + agents.get(i).isHostage() + ";";
+		}
+		result += " P ";
+		for(int i = 0; i < pills.size(); i++) {
+			if(i != pills.size() - 1)
+				result += pills.get(i).x + "," + pills.get(i).y + ",";
+			else
+				result += pills.get(i).x + "," + pills.get(i).y + ";";	
+		}
+		result += " PAD ";
+		for (String name: pads.keySet()) {
+		    String key = name.toString();
+		    String value = pads.get(name).toString();
+		    result += key + "," + value + ",";
+		}
+		result = result.substring(0, result.length() - 1) + ";";
+		
+		result += " H ";
+
+		for(int i = 0; i < hostages.size(); i++) {
+			if(i != hostages.size() - 1)
+				result += hostages.get(i).x + "," + hostages.get(i).y + "," + hostages.get(i).getDamage() + ",";
+			else
+				result += hostages.get(i).x + "," + hostages.get(i).y + "," + hostages.get(i).getDamage() + ";" ;
+		}
+		result += " CH ";
+
+		for(int i = 0; i < carriedHostages.size(); i++) {
+			if(i != carriedHostages.size() - 1)
+				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + "," + carriedHostages.get(i).getDamage() + ",";
+			else
+				result += carriedHostages.get(i).x + "," + carriedHostages.get(i).y + "," + carriedHostages.get(i).getDamage() + ";" ;
+		}
+		result += " D ";
+
+		return result +  damage + ";" + tookPill + ";";
+	}
 	public Point getNeo() {
 		return neo;
 	}
@@ -340,6 +363,15 @@ public class NeoState extends State{
 	public void setTookPill(boolean tookPill) {
 		this.tookPill = tookPill;
 	}
+
+	public boolean isPill() {
+		return pill;
+	}
+
+	public void setPill(boolean pill) {
+		this.pill = pill;
+	}
+	
 
 }
 
