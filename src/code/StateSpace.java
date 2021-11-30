@@ -181,8 +181,6 @@ public class StateSpace extends SearchProblem{
 	}
 	@Override 
 	public State transitionFunction(State state, String operator) {
-//		System.out.print(operator + " ");
-//		System.out.println(state.toString());
 		Point neoOriginal = ((NeoState) state).getNeo();	
 		int c = ((NeoState) state).getC();
 		boolean tookPill = ((NeoState) state).isTookPill();

@@ -1,7 +1,7 @@
 package code;
 
 public class SearchTreeNode {
-	State state; //should it be general walla 3adi?
+	State state;
 	SearchTreeNode parent;
 	String operator;
 	int depth;

@@ -5,7 +5,7 @@ import java.util.Hashtable;
 
 
 public abstract class SearchProblem {
-	State initialState; //should it be general walla 3adi?
+	State initialState;
 	String [] operators;
 	int nodesExpanded = 0;
 	int currlevel = 0;

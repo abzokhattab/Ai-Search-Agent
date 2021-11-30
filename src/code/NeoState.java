@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 
 
-public class NeoState extends State{
+public class NeoState extends State {
 	Point neo;
 	int c;
 	Point telephoneBooth;
@@ -15,7 +15,7 @@ public class NeoState extends State{
 	HashMap<String, String> pads;
 	ArrayList<Hostage> hostages;
 	ArrayList<Hostage> carriedHostages;
-	int damage; //cumulative or just the new damage?
+	int damage;
 	boolean tookPill = false;
 	String[][] grid;
 	boolean pill;
@@ -32,63 +32,77 @@ public class NeoState extends State{
 		this.pads = pads;
 		this.hostages = hostages;
 		this.damage = damage;
-		this.pathCost = this.damage;
 		this.carriedHostages = carriedHostages;
 		this.tookPill = tookPill;
 		this.grid = new String[m][n];
-		this.heuristicOne=heuristicFunction();
-		this.heuristicTwo=heuristicFunction();
+		this.heuristicOne = heuristicFunction();
+		this.heuristicTwo = heuristicFunction();
+		this.pathCost = pathCost();
 
 	}
 	
 	public int pathCost() {
-		int hostageAgent=0;
-		for(int i=0;i<agents.size();i++) {
+		int deaths = 0;
+		for(int i = 0; i < agents.size(); i++) {
 			if(agents.get(i).hostage)
-				hostageAgent++;				
+				deaths++;				
 		}
-		
-		int pillCost=2;
+		for (int i = 0; i < carriedHostages.size(); i++) {
+			if(carriedHostages.get(i).getDamage() >= 100)
+				deaths++;
+		}
+		int pillCost = 2;
 		if(pill)
-			pillCost=0;
+			pillCost = 0;
 		
-		int carried;
+		int carried = 1/(carriedHostages.size() + 1);
 		
-		carried=1/(carriedHostages.size()+1);
-		
-		
-		return (pillCost+hostageAgent+carried+damage);
+		return (pillCost + deaths*1000 + carried + damage*10);
 		
 	}
 	
 	public int heuristicFunction() {
 		if(goalTest())
 			return 0;
-		
-		int distance =calEuclideanDistance(this.neo.x,this.neo.y,this.telephoneBooth.x,this.telephoneBooth.y);
-		if(distance==0)
-			return 1;
-		
-		
-		for (String name: pads.keySet()) {
-			String key = name.toString();
-		    String value = pads.get(name).toString();
-		    String[] pad1 = key.split(",");
-		    String[] pad2 = value.split(",");
-		    
-		    int x=calEuclideanDistance(this.neo.x,this.neo.y,Integer.parseInt(pad1[0]),Integer.parseInt(pad1[1]))+calEuclideanDistance(Integer.parseInt(pad2[0]),Integer.parseInt(pad2[0]),this.telephoneBooth.x,this.telephoneBooth.y);
-		    
-		    if(x<distance) 
-		    	distance=x;
-		    
-		    
-		    int y= calEuclideanDistance(this.neo.x,this.neo.y,Integer.parseInt(pad2[0]),Integer.parseInt(pad2[1]))+calEuclideanDistance(Integer.parseInt(pad1[0]),Integer.parseInt(pad1[0]),this.telephoneBooth.x,this.telephoneBooth.y);
-		    
-		    if(y<distance) 
-		    	distance=y;
-		    
+		int pillCost = 2;
+		if(pill)
+			pillCost = 0;
+		int deaths = 0;
+		for(int i = 0; i < agents.size(); i++) {
+			if(agents.get(i).hostage)
+				deaths++;				
 		}
-		return distance;
+		for (int i = 0; i < carriedHostages.size(); i++) {
+			if(carriedHostages.get(i).getDamage() >= 100)
+				deaths++;
+		}
+		int carried = 1/(carriedHostages.size() + 1);
+		
+		return carried + deaths;
+//		int distance = calEuclideanDistance(this.neo.x, this.neo.y, this.telephoneBooth.x, this.telephoneBooth.y);
+//		if(distance == 0)
+//			return 1;
+//		
+//		
+//		for (String name: pads.keySet()) {
+//			String key = name.toString();
+//		    String value = pads.get(name).toString();
+//		    String[] pad1 = key.split(",");
+//		    String[] pad2 = value.split(",");
+//		    
+//		    int x = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad1[0]), Integer.parseInt(pad1[1])) + calEuclideanDistance(Integer.parseInt(pad2[0]), Integer.parseInt(pad2[0]), this.telephoneBooth.x, this.telephoneBooth.y);
+//		    
+//		    if(x < distance) 
+//		    	distance = x;
+//		    
+//		    
+//		    int y = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad2[0]), Integer.parseInt(pad2[1])) + calEuclideanDistance(Integer.parseInt(pad1[0]), Integer.parseInt(pad1[0]), this.telephoneBooth.x, this.telephoneBooth.y);
+//		    
+//		    if(y < distance) 
+//		    	distance = y;
+//		    
+//		}
+//		return distance;
 		}
 	
 	public boolean goalTest() {
