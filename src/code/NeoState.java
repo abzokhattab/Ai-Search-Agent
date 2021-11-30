@@ -35,17 +35,20 @@ public class NeoState extends State {
 		this.carriedHostages = carriedHostages;
 		this.tookPill = tookPill;
 		this.grid = new String[m][n];
-		this.heuristicOne = heuristicFunction();
-		this.heuristicTwo = heuristicFunction();
+		this.heuristicOne = heuristicFunction1();
+		this.heuristicTwo = heuristicFunction2();
 		this.pathCost = pathCost();
 
 	}
 	
 	public int pathCost() {
 		int deaths = 0;
+		int agentKills = 0;
 		for(int i = 0; i < agents.size(); i++) {
 			if(agents.get(i).hostage)
-				deaths++;				
+				deaths++;
+			if(!agents.get(i).isHostage() && agents.get(i).isKilled())
+				agentKills++;
 		}
 		for (int i = 0; i < carriedHostages.size(); i++) {
 			if(carriedHostages.get(i).getDamage() >= 100)
@@ -57,53 +60,103 @@ public class NeoState extends State {
 		
 		int carried = 1/(carriedHostages.size() + 1);
 		
-		return (pillCost + deaths*1000 + carried + damage*10);
-		
+		return (pillCost + deaths*1000 + carried + agentKills*100);
 	}
 	
-	public int heuristicFunction() {
+	public int heuristicFunction1() {
 		if(goalTest())
 			return 0;
-		int pillCost = 2;
-		if(pill)
-			pillCost = 0;
-		int deaths = 0;
+//		int pillCost = 2;
+//		if(pill)
+//			pillCost = 0;
+//
+//		int deaths = 0;
+//		int agentKills = 0;
+//
+//		for(int i = 0; i < agents.size(); i++) {
+//			if(agents.get(i).hostage)
+//				deaths++;
+//			if(!agents.get(i).isHostage() && agents.get(i).isKilled())
+//				agentKills++;
+//		}
+//		for (int i = 0; i < carriedHostages.size(); i++) {
+//			if(carriedHostages.get(i).getDamage() >= 100)
+//				deaths++;
+//		}
+//		int carried = 1/(carriedHostages.size() + 1);
+//	
+//		return carried + deaths + agentKills;
+		int distance = calEuclideanDistance(this.neo.x, this.neo.y, this.telephoneBooth.x, this.telephoneBooth.y);
+		if(distance == 0)
+			return 1;
+		
+		
+		for (String name: pads.keySet()) {
+			String key = name.toString();
+		    String value = pads.get(name).toString();
+		    String[] pad1 = key.split(",");
+		    String[] pad2 = value.split(",");
+		    
+		    int x = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad1[0]), Integer.parseInt(pad1[1])) + calEuclideanDistance(Integer.parseInt(pad2[0]), Integer.parseInt(pad2[0]), this.telephoneBooth.x, this.telephoneBooth.y);
+		    
+		    if(x < distance) 
+		    	distance = x;
+		    
+		    
+		    int y = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad2[0]), Integer.parseInt(pad2[1])) + calEuclideanDistance(Integer.parseInt(pad1[0]), Integer.parseInt(pad1[0]), this.telephoneBooth.x, this.telephoneBooth.y);
+		    
+		    if(y < distance) 
+		    	distance = y;
+		}
+			return distance * (hostages.size() + 1);
+	}
+	
+	public int heuristicFunction2() {
+		if(goalTest())
+			return 0;
+//		int pillCost = 2;
+//		if(pill)
+//			pillCost = 0;
+//
+//		int deaths = 0;
+		int agentKills = 0;
+
 		for(int i = 0; i < agents.size(); i++) {
 			if(agents.get(i).hostage)
-				deaths++;				
+				agentKills++;
 		}
-		for (int i = 0; i < carriedHostages.size(); i++) {
-			if(carriedHostages.get(i).getDamage() >= 100)
-				deaths++;
-		}
-		int carried = 1/(carriedHostages.size() + 1);
-		
-		return carried + deaths;
-//		int distance = calEuclideanDistance(this.neo.x, this.neo.y, this.telephoneBooth.x, this.telephoneBooth.y);
-//		if(distance == 0)
-//			return 1;
-//		
-//		
-//		for (String name: pads.keySet()) {
-//			String key = name.toString();
-//		    String value = pads.get(name).toString();
-//		    String[] pad1 = key.split(",");
-//		    String[] pad2 = value.split(",");
-//		    
-//		    int x = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad1[0]), Integer.parseInt(pad1[1])) + calEuclideanDistance(Integer.parseInt(pad2[0]), Integer.parseInt(pad2[0]), this.telephoneBooth.x, this.telephoneBooth.y);
-//		    
-//		    if(x < distance) 
-//		    	distance = x;
-//		    
-//		    
-//		    int y = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad2[0]), Integer.parseInt(pad2[1])) + calEuclideanDistance(Integer.parseInt(pad1[0]), Integer.parseInt(pad1[0]), this.telephoneBooth.x, this.telephoneBooth.y);
-//		    
-//		    if(y < distance) 
-//		    	distance = y;
-//		    
+//		for (int i = 0; i < carriedHostages.size(); i++) {
+//			if(carriedHostages.get(i).getDamage() >= 100)
+//				deaths++;
 //		}
-//		return distance;
+//		int carried = 1/(carriedHostages.size() + 1);
+//	
+//		return carried + deaths + agentKills;
+		int distance = calEuclideanDistance(this.neo.x, this.neo.y, this.telephoneBooth.x, this.telephoneBooth.y);
+		if(distance == 0)
+			return 1;
+		
+		
+		for (String name: pads.keySet()) {
+			String key = name.toString();
+		    String value = pads.get(name).toString();
+		    String[] pad1 = key.split(",");
+		    String[] pad2 = value.split(",");
+		    
+		    int x = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad1[0]), Integer.parseInt(pad1[1])) + calEuclideanDistance(Integer.parseInt(pad2[0]), Integer.parseInt(pad2[0]), this.telephoneBooth.x, this.telephoneBooth.y);
+		    
+		    if(x < distance) 
+		    	distance = x;
+		    
+		    
+		    int y = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad2[0]), Integer.parseInt(pad2[1])) + calEuclideanDistance(Integer.parseInt(pad1[0]), Integer.parseInt(pad1[0]), this.telephoneBooth.x, this.telephoneBooth.y);
+		    
+		    if(y < distance) 
+		    	distance = y;
+		    
 		}
+		return distance * (hostages.size() + 1 + agentKills);
+	}
 	
 	public boolean goalTest() {
 		int damage = this.getDamage();
