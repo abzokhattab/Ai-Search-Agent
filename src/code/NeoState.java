@@ -141,7 +141,17 @@ public class NeoState extends State {
 	}
 	
 	public int calEuclideanDistance(int x,int y,int z, int f) {
-		return (int) (Math.sqrt(Math.pow(f-y,2)+Math.pow(z-x,2)));
+//		return (int) (Math.sqrt(Math.pow(f-y,2)+Math.pow(z-x,2)));
+		return (int) ((f-y)+(z-x));
+	}
+	
+	public int distance() {
+		int hostagesDistance=0;
+		for(int i =0;i<hostages.size();i++) {
+			hostagesDistance=calEuclideanDistance(hostages.get(i).x,hostages.get(i).y,this.telephoneBooth.x, this.telephoneBooth.y);
+		}
+		return(hostagesDistance+calEuclideanDistance(this.neo.x, this.neo.y, this.telephoneBooth.x, this.telephoneBooth.y));
+		
 	}
 	
 	public boolean goalTest() {
