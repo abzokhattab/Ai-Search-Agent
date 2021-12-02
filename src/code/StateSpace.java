@@ -55,7 +55,7 @@ public class StateSpace extends MatrixProblem{
 			hostages.add(new Hostage(Integer.parseInt(hostageSplit[i]), Integer.parseInt(hostageSplit[i+1]), Integer.parseInt(hostageSplit[i+2])));
 		}
 		
-		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, new ArrayList<Hostage>(), false, 0, m, n, 0);
+		initialState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, new ArrayList<Hostage>(), false, 0, m, n, 0, "");
 		operators = new String[]{"up", "down", "right", "left", "carry", "drop", "kill", "takePill", "fly"};
 	}
 	public boolean agentCollision(ArrayList<Agent> agents, Point neo) {
@@ -222,7 +222,8 @@ public class StateSpace extends MatrixProblem{
 				Point newPosition = new Point(neo.x - 1, neo.y);
 				if(newPosition.x >= 0 && !agentCollision(agents, newPosition) && !hostageCollision(hostages, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
-					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n, depth);
+					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, 
+							carriedHostages, tookPill, damage, m, n, depth, operator);
 					if(states.containsKey(newState.toString())) {
 						return null;
 					}
@@ -235,7 +236,8 @@ public class StateSpace extends MatrixProblem{
 				Point newPosition = new Point(neo.x + 1, neo.y);
 				if(newPosition.x < m && !agentCollision(agents, newPosition) && !hostageCollision(hostages, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
-					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n, depth);
+					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, 
+							carriedHostages, tookPill, damage, m, n, depth, operator);
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
@@ -248,7 +250,8 @@ public class StateSpace extends MatrixProblem{
 				Point newPosition = new Point(neo.x, neo.y - 1);
 				if(newPosition.y >= 0 && !agentCollision(agents, newPosition) && !hostageCollision(hostages, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
-					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n, depth);
+					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, 
+							carriedHostages, tookPill, damage, m, n, depth, operator);
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
@@ -261,7 +264,8 @@ public class StateSpace extends MatrixProblem{
 				Point newPosition = new Point(neo.x, neo.y + 1);
 				if(newPosition.y < n && !agentCollision(agents, newPosition) && !hostageCollision(hostages, newPosition)) {
 					timeStep(false, hostages, carriedHostages, agents);
-					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n, depth);
+					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, 
+							carriedHostages, tookPill, damage, m, n, depth, operator);
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
@@ -279,7 +283,8 @@ public class StateSpace extends MatrixProblem{
 					int i = hostages.indexOf(saved);
 					hostages.remove(i);
 					timeStep(false, hostages, carriedHostages, agents);
-					State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n, depth);
+					State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, 
+							carriedHostages, tookPill, damage, m, n, depth, operator);
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
@@ -299,7 +304,8 @@ public class StateSpace extends MatrixProblem{
 					}
 					carriedHostages.clear();
 					timeStep(false, hostages, carriedHostages, agents);
-					State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n, depth);
+					State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, 
+							carriedHostages, tookPill, damage, m, n, depth, operator);
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
@@ -315,7 +321,8 @@ public class StateSpace extends MatrixProblem{
 						if(newDamage < 0)
 							newDamage = 0;
 						timeStep(true, hostages, carriedHostages, agents);
-						State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, true, newDamage, m, n, depth);
+						State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, 
+								carriedHostages, true, newDamage, m, n, depth, operator);
 						((NeoState) newState).setPill(true);
 						if(states.containsKey(newState.toString())){
 							return null;
@@ -330,7 +337,8 @@ public class StateSpace extends MatrixProblem{
 				 int newDamage = killAgents(neo, agents, damage);
 				 if(damage != newDamage && !hostageCollision(hostages, neo)) {
 					 timeStep(false, hostages, carriedHostages, agents);
-					 State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, newDamage, m, n, depth);
+					 State newState = new NeoState(neo, c, telephoneBooth, agents, pills, pads, hostages, 
+							 carriedHostages, tookPill, newDamage, m, n, depth, operator);
 					 if(states.containsKey(newState.toString())) {
 							return null;
 					 }
@@ -345,7 +353,8 @@ public class StateSpace extends MatrixProblem{
 					String[] fly = flySplit.split(",");
 					Point newPosition = new Point(Integer.parseInt(fly[0]), Integer.parseInt(fly[1]));
 					timeStep(false, hostages, carriedHostages, agents);
-					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, carriedHostages, tookPill, damage, m, n, depth);
+					State newState = new NeoState(newPosition, c, telephoneBooth, agents, pills, pads, hostages, 
+							carriedHostages, tookPill, damage, m, n, depth, operator);
 					if(states.containsKey(newState.toString())){
 						return null;
 					}
