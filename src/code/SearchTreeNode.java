@@ -18,8 +18,8 @@ public class SearchTreeNode {
 		this.operator = operator;
 		this.depth = depth;
 		this.pathCost = pathCost;
-		this.heuristicOne=heuristicOne;
-		this.heuristicTwo=heuristicTwo;
+		this.heuristicOne = heuristicOne;
+		this.heuristicTwo = heuristicTwo;
 		
 	}
 	
