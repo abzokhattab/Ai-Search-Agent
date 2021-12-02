@@ -60,9 +60,9 @@ public class NeoState extends State {
 				deaths++;
 		}
 			
-//		int carried = 1/(carriedHostages.size() + 1 + saved);
+		int carried = 1/(carriedHostages.size() + 1);
 		
-		return depth + (deaths*1000  + agentKills*100);
+		return depth + (carried + deaths*1000  + agentKills*100);
 	}
 	
 //	public int heuristicFunction1() {
@@ -81,44 +81,18 @@ public class NeoState extends State {
 	public int heuristicFunction1() {
 		if(goalTest())
 			return 0;
-		int distance = calEuclideanDistance(this.neo.x, this.neo.y, this.telephoneBooth.x, this.telephoneBooth.y);
-		if(distance == 0)
-			return 1;
-
-
-		for (String name: pads.keySet()) {
-			String key = name.toString();
-		    String value = pads.get(name).toString();
-		    String[] pad1 = key.split(",");
-		    String[] pad2 = value.split(",");
-
-		    int x = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad1[0]), Integer.parseInt(pad1[1])) + calEuclideanDistance(Integer.parseInt(pad2[0]), Integer.parseInt(pad2[0]), this.telephoneBooth.x, this.telephoneBooth.y);
-
-		    if(x < distance) 
-		    	distance = x;
-
-
-		    int y = calEuclideanDistance(this.neo.x, this.neo.y, Integer.parseInt(pad2[0]), Integer.parseInt(pad2[1])) + calEuclideanDistance(Integer.parseInt(pad1[0]), Integer.parseInt(pad1[0]), this.telephoneBooth.x, this.telephoneBooth.y);
-
-		    if(y < distance) 
-		    	distance = y;
-		}
-		
+		int distance = distance();
 		int agentKills = 0;
-		int numAgents = 0;
 		int deaths = 0;
-		int pillCost = 0;
 
 		for(int i = 0; i < agents.size(); i++) {
 			if(agents.get(i).hostage)
 				deaths++;
 			if(!agents.get(i).isHostage() && agents.get(i).isKilled())
 				agentKills++;
-			if(!agents.get(i).isKilled())
-				numAgents++;
 		}
 
-		return distance + (deaths*1000  + agentKills*100) ;
+		return distance + (deaths*1000  + agentKills*100);
 	}
 	
 	public int heuristicFunction2() {
@@ -126,7 +100,6 @@ public class NeoState extends State {
 			return 0;
 
 		int deaths = 0;
-
 		for(int i = 0; i < agents.size(); i++) {
 			if(agents.get(i).hostage)
 				deaths++;
@@ -137,7 +110,7 @@ public class NeoState extends State {
 		}
 		int carried = 1/(carriedHostages.size() + 1);
 		
-		return this.depth * (deaths + carried);
+		return this.depth + (carried + deaths*1000);
 	}
 	
 	public int calEuclideanDistance(int x,int y,int z, int f) {
